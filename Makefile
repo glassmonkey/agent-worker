@@ -1,11 +1,10 @@
-.PHONY: init install dev build test lint type-check clean help start-work finish-work end-work monitor-pr reply-to-review
-
 # デフォルトのターゲット
 .DEFAULT_GOAL := help
 
 # 共通の変数
 APP_DIR := app
 
+.PHONY: init
 # 初期化（プロジェクトの初期セットアップ）
 init: ## プロジェクトの初期化を行う
 	@echo "🚀 Initializing project..."
@@ -17,42 +16,50 @@ init: ## プロジェクトの初期化を行う
 	@cd $(APP_DIR) && npm run prepare
 	@echo "✨ Project initialized successfully!"
 
+.PHONY: install
 # 依存関係のインストール
 install: ## 依存関係をインストールする
 	@echo "📦 Installing dependencies..."
 	@cd $(APP_DIR) && npm install
 
+.PHONY: dev
 # 開発サーバーの起動
 dev: ## 開発サーバーを起動する
 	@echo "🔥 Starting development server..."
 	@cd $(APP_DIR) && npm run dev
 
+.PHONY: build
 # プロダクションビルド
 build: ## プロダクションビルドを実行する
 	@echo "🏗️  Building for production..."
 	@cd $(APP_DIR) && npm run build
 
+.PHONY: test
 # テストの実行
 test: ## テストを実行する
 	@echo "🧪 Running tests..."
 	@cd $(APP_DIR) && npm run test
 
+.PHONY: lint
 # リントの実行
 lint: ## リントを実行する
 	@echo "🔍 Running linter..."
 	@cd $(APP_DIR) && npm run lint
 
+.PHONY: type-check
 # 型チェックの実行
 type-check: ## 型チェックを実行する
 	@echo "✅ Running type check..."
 	@cd $(APP_DIR) && npm run type-check
 
+.PHONY: clean
 # クリーンアップ
 clean: ## ビルドファイルとキャッシュを削除する
 	@echo "🧹 Cleaning up..."
 	@cd $(APP_DIR) && rm -rf .next out node_modules
 	@echo "✨ Cleanup completed!"
 
+.PHONY: start-work
 # 作業開始
 start-work: ## 作業用ブランチを作成し、作業環境を準備する
 	@if [ -z "$(branch)" ]; then \
@@ -76,6 +83,7 @@ start-work: ## 作業用ブランチを作成し、作業環境を準備する
 	@echo "✨ Work environment initialized successfully!"
 	@echo "📝 PR draft created at .work/pr-draft.md"
 
+.PHONY: submit-work
 # PR作成
 submit-work: ## 作業内容をプッシュしてPRを作成する
 	@if [ -z "$(title)" ]; then \
@@ -102,6 +110,7 @@ submit-work: ## 作業内容をプッシュしてPRを作成する
 	@echo "👀 Starting PR monitoring..."
 	@$(MAKE) monitor-pr
 
+.PHONY: finish-work
 # 作業完了
 finish-work: ## レビュー通過後の作業を完了する
 	@echo "🔍 Checking PR status..."
@@ -116,11 +125,13 @@ finish-work: ## レビュー通過後の作業を完了する
 	@git branch -d $$(git rev-parse --abbrev-ref HEAD)
 	@echo "✨ Work completed successfully!"
 
+.PHONY: monitor-pr
 # レビューの監視
 monitor-pr: ## PRのレビュー状態とCIを監視する
 	@echo "👀 Monitoring PR status..."
 	@./scripts/monitor-pr.sh
 
+.PHONY: reply-to-review
 # レビューコメントへの返信
 reply-to-review: ## レビューコメントに返信する
 	@if [ -z "$(comment_id)" ] || [ -z "$(message)" ]; then \
@@ -132,6 +143,7 @@ reply-to-review: ## レビューコメントに返信する
 	@./scripts/reply-to-review.sh $(comment_id) "$(message)"
 	@echo "✨ Reply sent successfully!"
 
+.PHONY: help
 # ヘルプの表示
 help: ## このヘルプメッセージを表示する
 	@echo "Usage: make [target]"
