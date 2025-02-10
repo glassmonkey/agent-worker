@@ -178,10 +178,14 @@
        - 修正が必要な場合
          1. 修正内容を実装
          2. コミットとプッシュ
-         3. `make reply-to-review comment_id=<comment_id> message="<message>"`でコメントに返信
+         3. `make reply-to-review comment_id=<comment_id> message="<message>" include_commit=true`でコメントに返信
+            - 修正を行った場合は必ず`include_commit=true`を指定
+            - コミットリンクが自動的に追加される
          4. CIの完了を待って、コメントをresolveに変更
-       - 説明が必要な場合
-         1. `make reply-to-review comment_id=<comment_id> message="<message>"`で説明を返信
+       - 既存機能の説明が必要な場合
+         1. `make reply-to-review comment_id=<comment_id> message="<message>" include_commit=false`で説明を返信
+            - 既存機能の説明の場合は必ず`include_commit=false`を指定
+            - コミットリンクは追加されない
          2. コメントをresolveに変更
        - レビュー完了の確認
          - すべてのコメントがresolveされていることを確認
@@ -307,31 +311,23 @@
      - 修正が必要な場合
        1. 修正内容を実装
        2. コミットとプッシュ
-       3. `make reply-to-review comment_id=<comment_id> message="<message>"`でコメントに返信
+       3. `make reply-to-review comment_id=<comment_id> message="<message>" include_commit=true`でコメントに返信
+          - 修正を行った場合は必ず`include_commit=true`を指定
+          - コミットリンクが自動的に追加される
        4. CIの完了を待って、コメントをresolveに変更
-     - 説明が必要な場合
-       1. `make reply-to-review comment_id=<comment_id> message="<message>"`で説明を返信
+     - 既存機能の説明が必要な場合
+       1. `make reply-to-review comment_id=<comment_id> message="<message>" include_commit=false`で説明を返信
+          - 既存機能の説明の場合は必ず`include_commit=false`を指定
+          - コミットリンクは追加されない
        2. コメントをresolveに変更
      - レビュー完了の確認
        - すべてのコメントがresolveされていることを確認
        - CIが成功していることを確認
        - コンフリクトが解消されていることを確認
-     - マージの実行
-       - GitHub Web UIからマージを実行（ghコマンド経由でのマージは禁止）
-       - マージ前に変更内容を最終確認
-       - マージ後、`make finish-work`を実行して作業を完了
-
-- 作業の完了
-  1. レビュー通過後の作業を完了する
-     ```bash
-     make finish-work
-     ```
-     - このコマンドは以下を自動的に実行
-       - PRの状態確認（レビュー通過とCIの成功を確認）
-       - `.work`ディレクトリの掃除
-       - mainブランチへの切り替えと更新
-       - 作業ブランチの削除
-     - 注意: このコマンドはレビューが通過し、マージ可能な状態でのみ実行してください
+       - マージの実行
+         - GitHub Web UIからマージを実行（ghコマンド経由でのマージは禁止）
+         - マージ前に変更内容を最終確認
+         - マージ後、`make finish-work`
 
 ## 基本方針
 - 指示があったことは必ずルールに反映する
