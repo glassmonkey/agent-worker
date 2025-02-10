@@ -269,7 +269,7 @@
        - 補足事項
   3. PRの作成
      ```bash
-     gh pr create --title "<title>" --body-file .work/pr-draft.md
+     gh pr create --repo $(git remote get-url origin | sed 's/.*://; s/\.git$//') --title "<title>" --body-file .work/pr-draft.md
      ```
 
 - レビュー用PRの監視および対応

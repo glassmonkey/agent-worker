@@ -71,7 +71,13 @@ finish-work: ## PRを作成し、作業を終了する
 		exit 1; \
 	fi
 	@echo "🏁 Finishing work with PR title: $(title)..."
-	@./scripts/finish-work.sh "$(title)"
+	@if [ ! -f .work/pr-draft.md ]; then \
+		echo "⚠️  PR draft file not found at .work/pr-draft.md"; \
+		exit 1; \
+	fi
+	@echo "📤 Creating PR..."
+	@gh pr create --repo $$(git remote get-url origin | sed 's/.*://; s/\.git$$//') --title "$(title)" --body-file .work/pr-draft.md
+	@echo "✨ PR created successfully!"
 
 # ヘルプの表示
 help: ## このヘルプメッセージを表示する
