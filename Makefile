@@ -1,10 +1,23 @@
-.PHONY: init install dev build test lint type-check clean help
+.PHONY: init install dev build test lint type-check clean help update-main push
 
 # デフォルトのターゲット
 .DEFAULT_GOAL := help
 
 # 共通の変数
 APP_DIR := app
+
+# mainブランチの更新
+update-main: ## mainブランチを最新に更新する
+	@echo "🔄 Updating main branch..."
+	@git fetch origin main
+	@git switch main
+	@git pull origin main
+	@git switch -
+
+# プッシュ（mainブランチの更新を含む）
+push: update-main ## 変更をプッシュする（mainブランチの更新を含む）
+	@echo "⬆️  Pushing changes..."
+	@git push
 
 # 初期化（プロジェクトの初期セットアップ）
 init: ## プロジェクトの初期化を行う
