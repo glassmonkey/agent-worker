@@ -88,21 +88,16 @@ finish-work: ## PRを作成し、作業を終了する
 		echo "⚠️  PR draft file not found at .work/pr-draft.md"; \
 		exit 1; \
 	fi
-	@echo "📤 Creating PR..."
-	@gh pr create --repo $$(git remote get-url origin | sed 's/.*://; s/\.git$$//') --title "$(title)" --body-file .work/pr-draft.md
-	@echo "✨ PR created successfully!"
-
-# 作業終了
-end-work: ## 作業を終了し、mainブランチに戻る
 	@echo "🔍 Checking for uncommitted changes..."
 	@if [ -n "$$(git status --porcelain)" ]; then \
 		echo "⚠️  You have uncommitted changes. Please commit or stash them first."; \
 		exit 1; \
 	fi
+	@echo "📤 Creating PR..."
+	@gh pr create --repo $$(git remote get-url origin | sed 's/.*://; s/\.git$$//') --title "$(title)" --body-file .work/pr-draft.md
+	@echo "✨ PR created successfully!"
 	@echo "🧹 Cleaning .work directory..."
 	@rm -rf .work/*
-	@echo "🔄 Switching to main branch..."
-	@git switch main
 	@echo "✨ Work completed successfully!"
 
 # ヘルプの表示
@@ -111,16 +106,3 @@ help: ## このヘルプメッセージを表示する
 	@echo ""
 	@echo "Targets:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}' 
-
-# 作業終了
-end-work:
-	@echo "🔍 Checking for uncommitted changes..."
-	@if [ -n "$$(git status --porcelain)" ]; then \
-		echo "⚠️  You have uncommitted changes. Please commit or stash them first."; \
-		exit 1; \
-	fi
-	@echo "🧹 Cleaning .work directory..."
-	@rm -rf .work/*
-	@echo "🔄 Switching to main branch..."
-	@git switch main
-	@echo "✨ Work completed successfully!"
