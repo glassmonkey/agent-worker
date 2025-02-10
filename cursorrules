@@ -1,0 +1,52 @@
+# Project Rules
+
+## Git Rules
+- Commit messages should follow the Conventional Commits format
+  - feat: A new feature
+  - fix: A bug fix
+  - docs: Documentation only changes
+  - style: Changes that do not affect the meaning of the code
+  - refactor: A code change that neither fixes a bug nor adds a feature
+  - test: Adding missing tests or correcting existing tests
+  - chore: Changes to the build process or auxiliary tools
+- Each commit should be focused on a single responsibility
+- First commit should be named "first commit" and contain initial project setup
+
+## Code Style
+- Use consistent indentation (spaces preferred over tabs)
+- Keep lines under 120 characters
+- Remove trailing whitespace
+- Add a newline at the end of files
+- Use meaningful and descriptive names for variables, functions, and classes
+
+## Project Structure
+- Keep related files close to each other
+- Use lowercase with hyphens for directory and file names
+- Maintain a clear and logical directory structure
+- Place configuration files in the root directory
+
+## Version Control
+- Use .gitignore to exclude unnecessary files
+- Keep dependencies up to date
+- Lock dependency versions for consistency
+
+## Documentation
+- Maintain an up-to-date README.md
+- Document complex logic and important decisions
+- Include setup instructions in README.md
+- Document environment requirements
+
+## Testing
+- Write tests for new features
+- Maintain existing tests
+- Run tests before committing
+
+## Code Review
+- Review code before merging
+- Address all review comments
+- Keep pull requests focused and manageable in size
+
+## Development Environment
+- Use .tool-versions for version management
+- Document required tools and versions
+- Keep development environment setup instructions updated 
