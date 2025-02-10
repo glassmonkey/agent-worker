@@ -1,52 +1,52 @@
-# Project Rules
+# プロジェクトルール
 
-## Git Rules
-- Commit messages should follow the Conventional Commits format
-  - feat: A new feature
-  - fix: A bug fix
-  - docs: Documentation only changes
-  - style: Changes that do not affect the meaning of the code
-  - refactor: A code change that neither fixes a bug nor adds a feature
-  - test: Adding missing tests or correcting existing tests
-  - chore: Changes to the build process or auxiliary tools
-- Each commit should be focused on a single responsibility
-- First commit should be named "first commit" and contain initial project setup
+## Gitルール
+- コミットメッセージは Conventional Commits 形式に従う
+  - feat: 新機能の追加
+  - fix: バグ修正
+  - docs: ドキュメントの変更のみ
+  - style: コードの意味に影響を与えない変更
+  - refactor: バグ修正や機能追加を含まないコードの変更
+  - test: テストの追加や既存テストの修正
+  - chore: ビルドプロセスやツールの変更
+- 各コミットは単一の責任に焦点を当てる
+- 最初のコミットは "first commit" とし、プロジェクトの初期設定を含める
 
-## Code Style
-- Use consistent indentation (spaces preferred over tabs)
-- Keep lines under 120 characters
-- Remove trailing whitespace
-- Add a newline at the end of files
-- Use meaningful and descriptive names for variables, functions, and classes
+## コードスタイル
+- 一貫したインデント（タブよりスペースを推奨）
+- 1行は120文字以内に収める
+- 末尾の空白を削除する
+- ファイルの末尾には改行を入れる
+- 変数、関数、クラスには意味のある分かりやすい名前を使用する
 
-## Project Structure
-- Keep related files close to each other
-- Use lowercase with hyphens for directory and file names
-- Maintain a clear and logical directory structure
-- Place configuration files in the root directory
+## プロジェクト構造
+- 関連するファイルは近くに配置する
+- ディレクトリとファイル名は小文字とハイフンを使用する
+- 明確で論理的なディレクトリ構造を維持する
+- 設定ファイルはルートディレクトリに配置する
 
-## Version Control
-- Use .gitignore to exclude unnecessary files
-- Keep dependencies up to date
-- Lock dependency versions for consistency
+## バージョン管理
+- .gitignoreで不要なファイルを除外する
+- 依存関係は最新の状態を保つ
+- 依存関係のバージョンは固定する
 
-## Documentation
-- Maintain an up-to-date README.md
-- Document complex logic and important decisions
-- Include setup instructions in README.md
-- Document environment requirements
+## ドキュメント
+- README.mdは常に最新の状態を保つ
+- 複雑なロジックや重要な決定事項を文書化する
+- README.mdにセットアップ手順を含める
+- 環境要件を文書化する
 
-## Testing
-- Write tests for new features
-- Maintain existing tests
-- Run tests before committing
+## テスト
+- 新機能にはテストを書く
+- 既存のテストを維持する
+- コミット前にテストを実行する
 
-## Code Review
-- Review code before merging
-- Address all review comments
-- Keep pull requests focused and manageable in size
+## コードレビュー
+- マージ前にコードレビューを行う
+- レビューコメントに対応する
+- プルリクエストは焦点を絞り、管理可能なサイズに保つ
 
-## Development Environment
-- Use .tool-versions for version management
-- Document required tools and versions
-- Keep development environment setup instructions updated 
+## 開発環境
+- バージョン管理には.tool-versionsを使用する
+- 必要なツールとバージョンを文書化する
+- 開発環境のセットアップ手順を最新に保つ 
