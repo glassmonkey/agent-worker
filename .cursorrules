@@ -10,6 +10,21 @@
   2. 影響を受けるルールを特定
   3. ルールの更新が必要な場合は、該当セクションを修正
   4. 変更をコミットし、PRを作成
+- 手順の誤りが発見された場合の修正プロセス
+  1. レビューコメントで指摘された誤りを確認
+  2. 修正内容を実装
+     - 該当する手順の修正
+     - 関連するルールの更新
+     - 必要に応じてスクリプトの修正
+  3. 修正をコミット
+  4. レビューコメントに返信
+     - 一時ファイルを使用して改行を適切に処理
+     ```bash
+     echo -e "返信内容\n\n修正内容の説明\n\n修正コミット: コミットハッシュ" > .work/comment.txt && \
+     gh pr comment $PR_NUMBER --body-file .work/comment.txt
+     ```
+  5. CIの完了を待って、コメントをresolveに変更
+  6. 必要に応じて手順2-5を繰り返す
 
 ## プロジェクト概要
 - `app`ディレクトリ以下はNext.jsアプリケーション
@@ -131,20 +146,57 @@
   - レビューコメントに対応済みであることを確認
   - コンフリクトが解消されていることを確認
 - PRのレビュー対応
-  - コメントの監視
-    - `gh api`を使用してコメントを取得
-    - 30秒ごとに新しいコメントを確認
-  - コメントへの返信
-    1. 修正内容を実装
-    2. コミットとプッシュ
-    3. コメントに以下の内容で返信
-       - 修正内容の説明
-       - 修正を含むコミットのハッシュ
-    4. CIの完了を確認
-    5. CIが成功したらコメントをresolveに変更
-  - コメント解決の確認
-    - `gh api`でコメントの状態を確認
-    - 未解決のコメントがないことを確認
+  - レビューコメントの監視
+    - `./scripts/monitor-pr.sh`を使用
+    - 30秒ごとに以下を確認
+      - PRの状態（OPEN/MERGED/CLOSED）
+      - レビューコメント
+      - CIの状態
+    - マージ後は自動的にmainブランチに切り替え
+  - レビューコメントへの返信
+    1. コメントの改行は`\n`を使用
+    2. `--raw-field`フラグを使用して改行を適切に処理
+     ```bash
+     gh api \
+       --method POST \
+       -H "Accept: application/vnd.github+json" \
+       --raw-field body="返信内容\n\n修正内容の説明\n\n修正コミット: コミットハッシュ" \
+       /repos/OWNER/REPO/issues/comments/COMMENT_ID/replies
+     ```
+  3. CIの状態確認
+     ```bash
+     gh api graphql -f query='
+       query($owner: String!, $repo: String!, $pr_number: Int!) {
+         repository(owner: $owner, name: $repo) {
+           pullRequest(number: $pr_number) {
+             commits(last: 1) {
+               nodes {
+                 commit {
+                   statusCheckRollup {
+                     state
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
+     ```
+  4. レビューまたはCIが完了していない場合
+     ```bash
+     sleep 30
+     ```
+     その後、手順1-3を再実行
+  5. レビューコメントがある場合
+     - 修正内容を実装
+     - コミットとプッシュ
+     - コメントに返信（修正内容とコミットハッシュを含める）
+     - CIの完了を待って、コメントをresolveに変更
+  6. すべてのチェックが完了するまで3-4を繰り返す
+  7. レビューが承認され、CIが成功したら、GitHub Web UIからマージを実行
+     - ghコマンド経由でのマージは禁止
+     - 必ず手動でマージを実行し、変更内容を最終確認
 
 ## CI/CD
 - GitHub Actionsを使用して以下を自動化
@@ -251,29 +303,20 @@
 - レビュー用PRの監視および対応
   1. レビューコメントの監視
      ```bash
-     gh api graphql -f query='
-       query($owner: String!, $repo: String!, $pr_number: Int!) {
-         repository(owner: $owner, name: $repo) {
-           pullRequest(number: $pr_number) {
-             state
-             reviewDecision
-             reviews(first: 100) {
-               nodes {
-                 state
-                 comments(first: 100) {
-                   nodes {
-                     body
-                     state
-                   }
-                 }
-               }
-             }
-           }
-         }
-       }
-     ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
+     ./scripts/monitor-pr.sh
      ```
-  2. CIの状態確認
+     - 30秒ごとに以下を確認
+       - PRの状態（OPEN/MERGED/CLOSED）
+       - レビューコメント
+       - CIの状態
+     - マージ後は自動的にmainブランチに切り替え
+  2. レビューコメントへの返信
+     - 一時ファイルを使用して改行を適切に処理
+     ```bash
+     echo -e "返信内容\n\n修正内容の説明\n\n修正コミット: コミットハッシュ" > .work/comment.txt && \
+     gh pr comment $PR_NUMBER --body-file .work/comment.txt
+     ```
+  3. CIの状態確認
      ```bash
      gh api graphql -f query='
        query($owner: String!, $repo: String!, $pr_number: Int!) {
@@ -293,18 +336,18 @@
        }
      ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
      ```
-  3. レビューまたはCIが完了していない場合
+  4. レビューまたはCIが完了していない場合
      ```bash
      sleep 30
      ```
-     その後、手順1-2を再実行
-  4. レビューコメントがある場合
+     その後、手順1-3を再実行
+  5. レビューコメントがある場合
      - 修正内容を実装
      - コミットとプッシュ
      - コメントに返信（修正内容とコミットハッシュを含める）
      - CIの完了を待って、コメントをresolveに変更
-  5. すべてのチェックが完了するまで3-4を繰り返す
-  6. レビューが承認され、CIが成功したら、GitHub Web UIからマージを実行
+  6. すべてのチェックが完了するまで3-4を繰り返す
+  7. レビューが承認され、CIが成功したら、GitHub Web UIからマージを実行
      - ghコマンド経由でのマージは禁止
      - 必ず手動でマージを実行し、変更内容を最終確認
 
