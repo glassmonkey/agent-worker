@@ -81,6 +81,14 @@
 - CIの実行結果はPRにコメントとして自動的に追加される
 - ワークフローファイルは`.github/workflows`に配置
 - Node.jsのバージョンは`.tool-versions`で管理
+- ワークフローの確認手順
+  - プッシュ後は30秒ごとにワークフローの状態を確認
+  - `gh run list --workflow="PR Check CI" --limit 1`で確認
+  - 失敗時は`gh run view <run-id> --log-failed`でログを確認
+  - 修正後は再度30秒ごとに確認
+  - 全てのチェックが通過するまで繰り返す
+  - 成功したらPRをマージ
+  - マージ後はmainブランチに切り替えて最新の状態に更新
 
 ## Next.jsアプリケーションルール
 - App Router規約に従ったファイル配置
