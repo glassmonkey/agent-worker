@@ -49,20 +49,48 @@
 - 新しい作業は必ずブランチを作成して実施
   - ブランチ名は作業内容を表す名前をつける
   - 例: `feature/add-user-auth`, `fix/login-error`
+- PRの作成手順
+  1. 作業用の新しいブランチを作成
+     ```bash
+     git checkout -b feature/your-feature-name
+     ```
+  2. 変更を実装してコミット
+  3. `.work`ディレクトリを作成（存在しない場合）
+     ```bash
+     mkdir -p .work
+     ```
+  4. PR説明用の一時ファイルを作成
+     ```bash
+     cp .github/pull_request_template.md .work/pr-draft.md
+     ```
+  5. PR説明を編集（`.work/pr-draft.md`）
+     - 概要: PRの目的、背景、変更点を簡潔に記載
+     - 変更内容: 具体的な変更内容をリストアップ
+     - 確認したこと: 動作確認やテストの内容を記載
+     - 補足: レビュアーへの注意点や補足事項を記載
+  6. 変更をプッシュしてPRを作成
+     ```bash
+     git push -u origin feature/your-feature-name
+     gh pr create --title "変更の種類: タイトル" --body-file .work/pr-draft.md
+     ```
+  7. CIの実行結果を確認
+     ```bash
+     gh run list --workflow="PR Check CI" --limit 1
+     sleep 30  # 30秒待機
+     gh run list --workflow="PR Check CI" --limit 1  # 再確認
+     ```
+  8. CIが失敗した場合
+     ```bash
+     gh run view <run-id>  # ログを確認
+     ```
+     - エラーを修正して再度プッシュ
+     - CIが成功するまで7-8を繰り返す
+  9. レビュー依頼
+     - CIが成功したことを確認
+     - レビュアーにレビューを依頼
 - 作業単位でPRを作成
-  - `gh pr create`コマンドを使用
   - PRのタイトルは変更内容を簡潔に表現
-  - PRの説明は以下の手順で作成
-    1. `.work`ディレクトリを作成（存在しない場合）
-    2. 一時的なマークダウンファイルを作成（例: `.work/pr-draft.md`）
-    3. `.github/pull_request_template.md`の内容をベースに、PR固有の内容を記載
-    4. `gh pr create --body-file`で一時ファイルを使用してPRを作成
-    5. PR作成後は一時ファイルを削除
-  - PRの説明には以下を含める
-    - 概要: PRの目的、背景、変更点を簡潔に記載
-    - 変更内容: 具体的な変更内容をリストアップ
-    - 確認したこと: 動作確認やテストの内容を記載
-    - 補足: レビュアーへの注意点や補足事項を記載
+  - PRの説明は必ずテンプレートに従って作成
 - PRは小さく保つ
   - 1つのPRで1つの機能や修正を扱う
   - レビューしやすい規模を維持
