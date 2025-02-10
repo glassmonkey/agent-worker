@@ -18,10 +18,9 @@
      - 必要に応じてスクリプトの修正
   3. 修正をコミット
   4. レビューコメントに返信
-     - 一時ファイルを使用して改行を適切に処理
+     - レビューコメントに直接リプライする形式で返信
      ```bash
-     echo -e "返信内容\n\n修正内容の説明\n\n修正コミット: コミットハッシュ" > .work/comment.txt && \
-     gh pr comment $PR_NUMBER --body-file .work/comment.txt
+     gh pr review --comment --body "修正内容の説明\n\n修正コミット: コミットハッシュ" $PR_NUMBER
      ```
   5. CIの完了を待って、コメントをresolveに変更
   6. 必要に応じて手順2-5を繰り返す
@@ -154,14 +153,9 @@
       - CIの状態
     - マージ後は自動的にmainブランチに切り替え
   - レビューコメントへの返信
-    1. コメントの改行は`\n`を使用
-    2. `--raw-field`フラグを使用して改行を適切に処理
+    1. レビューコメントに直接リプライする形式で返信
      ```bash
-     gh api \
-       --method POST \
-       -H "Accept: application/vnd.github+json" \
-       --raw-field body="返信内容\n\n修正内容の説明\n\n修正コミット: コミットハッシュ" \
-       /repos/OWNER/REPO/issues/comments/COMMENT_ID/replies
+     gh pr review --comment --body "修正内容の説明\n\n修正コミット: コミットハッシュ" $PR_NUMBER
      ```
   3. CIの状態確認
      ```bash
@@ -311,10 +305,9 @@
        - CIの状態
      - マージ後は自動的にmainブランチに切り替え
   2. レビューコメントへの返信
-     - 一時ファイルを使用して改行を適切に処理
+     - レビューコメントに直接リプライする形式で返信
      ```bash
-     echo -e "返信内容\n\n修正内容の説明\n\n修正コミット: コミットハッシュ" > .work/comment.txt && \
-     gh pr comment $PR_NUMBER --body-file .work/comment.txt
+     gh pr review --comment --body "修正内容の説明\n\n修正コミット: コミットハッシュ" $PR_NUMBER
      ```
   3. CIの状態確認
      ```bash
