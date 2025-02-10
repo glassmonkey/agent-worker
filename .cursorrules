@@ -40,17 +40,14 @@
          }
        ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
        ```
-     - リプライを送信（ヒアドキュメントで改行を保持）
+     - リプライを送信（JSONフォーマットで改行を保持）
        ```bash
+       echo '{"body": "修正内容の説明\n\n修正コミット: コミットハッシュ"}' | \
        gh api \
          --method POST \
          -H "Accept: application/vnd.github+json" \
          /repos/$OWNER/$REPO/pulls/$PR_NUMBER/comments/$COMMENT_ID/replies \
-         --raw-field body@- << EOF
-修正内容の説明
-
-修正コミット: コミットハッシュ
-EOF
+         --input -
        ```
   5. CIの完了を待って、コメントをresolveに変更
   6. 必要に応じて手順2-5を繰り返す
@@ -205,17 +202,14 @@ EOF
          }
        ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
        ```
-     - リプライを送信（ヒアドキュメントで改行を保持）
+     - リプライを送信（JSONフォーマットで改行を保持）
        ```bash
+       echo '{"body": "修正内容の説明\n\n修正コミット: コミットハッシュ"}' | \
        gh api \
          --method POST \
          -H "Accept: application/vnd.github+json" \
          /repos/$OWNER/$REPO/pulls/$PR_NUMBER/comments/$COMMENT_ID/replies \
-         --raw-field body@- << EOF
-修正内容の説明
-
-修正コミット: コミットハッシュ
-EOF
+         --input -
        ```
   3. CIの状態確認
      ```bash
@@ -387,17 +381,14 @@ EOF
          }
        ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
        ```
-     - リプライを送信（ヒアドキュメントで改行を保持）
+     - リプライを送信（JSONフォーマットで改行を保持）
        ```bash
+       echo '{"body": "修正内容の説明\n\n修正コミット: コミットハッシュ"}' | \
        gh api \
          --method POST \
          -H "Accept: application/vnd.github+json" \
          /repos/$OWNER/$REPO/pulls/$PR_NUMBER/comments/$COMMENT_ID/replies \
-         --raw-field body@- << EOF
-修正内容の説明
-
-修正コミット: コミットハッシュ
-EOF
+         --input -
        ```
   3. CIの状態確認
      ```bash
