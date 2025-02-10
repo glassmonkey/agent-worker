@@ -1,9 +1,102 @@
 #!/bin/bash
 
+# 終了コード
+# 0: すべてのチェックが通過し、マージ可能
+# 1: CIが失敗
+# 2: 未解決のレビューコメントあり
+# 3: コンフリクトあり
+# 4: その他のエラー
+
 # 引数からPR番号を取得
 PR_NUMBER=${1:-$(gh pr view --json number -q .number)}
+if [ -z "$PR_NUMBER" ]; then
+  echo "❌ PR number is required"
+  exit 4
+fi
+
 OWNER=$(gh repo view --json owner -q .owner.login)
 REPO=$(gh repo view --json name -q .name)
+
+echo "🔍 Checking PR #$PR_NUMBER status..."
+
+# PRの状態を確認
+PR_STATUS=$(gh api graphql -f query='
+  query($owner: String!, $repo: String!, $pr_number: Int!) {
+    repository(owner: $owner, name: $repo) {
+      pullRequest(number: $pr_number) {
+        state
+        mergeable
+        reviewDecision
+        commits(last: 1) {
+          nodes {
+            commit {
+              statusCheckRollup {
+                state
+              }
+            }
+          }
+        }
+        reviewThreads(first: 100) {
+          nodes {
+            isResolved
+            comments(first: 1) {
+              nodes {
+                body
+                databaseId
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER)
+
+# PRの状態を解析
+PR_STATE=$(echo "$PR_STATUS" | jq -r '.data.repository.pullRequest.state')
+if [ "$PR_STATE" = "MERGED" ]; then
+  echo "✨ PR #$PR_NUMBER has been merged"
+  git switch main
+  git pull origin main
+  rm -rf .work/*
+  exit 0
+elif [ "$PR_STATE" = "CLOSED" ]; then
+  echo "❌ PR #$PR_NUMBER has been closed"
+  exit 4
+fi
+
+# マージ可能状態を確認
+MERGEABLE=$(echo "$PR_STATUS" | jq -r '.data.repository.pullRequest.mergeable')
+if [ "$MERGEABLE" = "CONFLICTING" ]; then
+  echo "⚠️  PR has conflicts that need to be resolved"
+  exit 3
+fi
+
+# CIの状態を確認
+CI_STATUS=$(echo "$PR_STATUS" | jq -r '.data.repository.pullRequest.commits.nodes[0].commit.statusCheckRollup.state')
+echo "🔄 CI Status: $CI_STATUS"
+if [ "$CI_STATUS" = "FAILURE" ]; then
+  echo "❌ CI checks have failed"
+  exit 1
+fi
+
+# 未解決のレビューコメントを確認
+UNRESOLVED_THREADS=$(echo "$PR_STATUS" | jq -r '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false)')
+if [ ! -z "$UNRESOLVED_THREADS" ]; then
+  echo "⚠️  There are unresolved review comments:"
+  echo "$UNRESOLVED_THREADS" | jq -r '.comments.nodes[0].body'
+  echo "Comment ID: $(echo "$UNRESOLVED_THREADS" | jq -r '.comments.nodes[0].databaseId')"
+  exit 2
+fi
+
+# すべてのチェックが通過
+if [ "$CI_STATUS" = "SUCCESS" ]; then
+  echo "✅ All checks passed. PR is ready to be merged"
+  exit 0
+else
+  echo "⏳ Waiting for CI checks to complete"
+  exit 1
+fi
 
 # レビューコメントに返信する関数
 reply_to_comment() {
