@@ -216,7 +216,6 @@
            - LGTMコメントがある場合:
              - 最新のLGTMコメント以降のコミットがある場合はLGTMコメントを無視
              - 最新のLGTMコメント以降のコミットがない場合はGitHub Web UIからマージを実行し、その後`make finish-work`を実行
-           - LGTMコメントがない場合はGitHub Web UIからマージを実行（ghコマンド経由でのマージは禁止）
            - マージ前に変更内容を最終確認
            - マージ後、`make finish-work`で後処理を実行
              - `.work`ディレクトリの掃除
@@ -360,7 +359,6 @@
            - LGTMコメントがある場合:
              - 最新のLGTMコメント以降のコミットがある場合はLGTMコメントを無視
              - 最新のLGTMコメント以降のコミットがない場合はGitHub Web UIからマージを実行し、その後`make finish-work`を実行
-           - LGTMコメントがない場合はGitHub Web UIからマージを実行（ghコマンド経由でのマージは禁止）
            - マージ前に変更内容を最終確認
            - マージ後、`make finish-work`で後処理を実行
              - `.work`ディレクトリの掃除
