@@ -73,6 +73,7 @@
 
 ## ブランチ運用とPR
 - 新しい作業は必ずブランチを作成して実施
+  - 作業開始前に`.work/pr-draft.md`が存在する場合は削除
   - ブランチ名は作業内容を表す名前をつける
   - 例: `feature/add-user-auth`, `fix/login-error`
 - 作業単位でPRを作成
