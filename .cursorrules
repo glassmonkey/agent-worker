@@ -248,4 +248,133 @@
   - ファイル種類
     - PRのドラフト（`pr-draft.md`）
     - レビュー時のメモ（`review-notes.md`）
-    - その他の一時ファイル（`temp-*`） 
+    - その他の一時ファイル（`temp-*`）
+
+## 作業手順
+- 作業の準備
+  1. mainブランチの更新
+     ```bash
+     git fetch origin main
+     git switch main
+     git pull origin main
+     ```
+  2. `.work`ディレクトリの掃除
+     ```bash
+     rm -rf .work/*
+     ```
+  3. 作業用ブランチの作成
+     - ブランチ名は作業内容を表す名前をつける
+     - 例: `feature/add-user-auth`, `fix/login-error`
+     ```bash
+     git checkout -b <branch-name>
+     ```
+
+- 作業の実施
+  1. 作業内容の実装
+     - 小さな単位で実装
+     - 適宜コミットを作成
+  2. 動作確認
+     - 単体テストの実行
+     - リンター/型チェックの実行
+     - 手動での動作確認
+  3. コミットの整理
+     - `git log`で作業内容を確認
+     - `git rebase -i main`で関連するコミットをまとめる
+     - コミットメッセージを適切に修正
+
+- 作業内容のルールへの反映
+  1. 手順の修正内容を確認
+  2. 影響を受けるルールを特定
+  3. ルールの更新が必要な場合
+     - 該当セクションを修正
+     - 拡張子固有のルールは`.cursor/rules`以下に配置
+     - 関連する既存のセクションに追加または新規セクション作成
+  4. 変更をコミット
+
+- レビュー用PRの作成
+  1. `.work`ディレクトリの準備
+     ```bash
+     mkdir -p .work
+     ```
+  2. PR説明の作成
+     - `.work/pr-draft.md`にPR説明を作成
+     - `.github/pull_request_template.md`をベースに作成
+     - 必要な情報を記載
+       - 概要
+       - 変更内容
+       - 確認したこと
+       - 動作確認の内容
+       - 補足事項
+  3. PRの作成
+     ```bash
+     gh pr create --title "<title>" --body-file .work/pr-draft.md
+     ```
+
+- レビュー用PRの監視および対応
+  1. レビューコメントの監視
+     ```bash
+     gh api graphql -f query='
+       query($owner: String!, $repo: String!, $pr_number: Int!) {
+         repository(owner: $owner, name: $repo) {
+           pullRequest(number: $pr_number) {
+             state
+             reviewDecision
+             reviews(first: 100) {
+               nodes {
+                 state
+                 comments(first: 100) {
+                   nodes {
+                     body
+                     state
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
+     ```
+  2. コメントへの対応
+     - 修正内容を実装
+     - コミットとプッシュ
+     - コメントに返信（修正内容とコミットハッシュを含める）
+  3. CIの状態確認
+     ```bash
+     gh api graphql -f query='
+       query($owner: String!, $repo: String!, $pr_number: Int!) {
+         repository(owner: $owner, name: $repo) {
+           pullRequest(number: $pr_number) {
+             commits(last: 1) {
+               nodes {
+                 commit {
+                   statusCheckRollup {
+                     state
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
+     ```
+  4. 必要に応じて再度修正
+
+- レビュー用PRマージ後の後始末
+  1. mainブランチに切り替え
+     ```bash
+     git switch main
+     ```
+  2. 最新の変更を取り込む
+     ```bash
+     git pull origin main
+     ```
+  3. `.work`ディレクトリの掃除
+     ```bash
+     rm -rf .work/*
+     ```
+  4. 作業ブランチの削除
+     ```bash
+     git branch -d <branch-name>
+     ```
