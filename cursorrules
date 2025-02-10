@@ -25,6 +25,11 @@
 - 各コミットは単一の責任に焦点を当てる
 - 最初のコミットは "first commit" とし、プロジェクトの初期設定を含める
 - プッシュ前の確認
+  - mainブランチの更新
+    1. `git fetch origin main`で最新の情報を取得
+    2. `git switch main`でmainブランチに切り替え
+    3. `git pull origin main`で最新の変更を取り込む
+    4. `git switch -`で作業ブランチに戻る
   - `git diff main`で変更内容を確認
   - 以下の点をチェック
     - 不要なファイルが含まれていないか
