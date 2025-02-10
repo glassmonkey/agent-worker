@@ -163,124 +163,6 @@
   4. 失敗時は `gh run view` でログを確認して対応
   5. すべてのチェックがパスするまで2-3を繰り返す
   6. 成功したらレビューを依頼
-- PRマージ監視手順
-  1. レビューを依頼後、以下のコマンドを実行してレビュー状態を確認
-     ```bash
-     gh api graphql -f query='
-       query($owner: String!, $repo: String!, $pr_number: Int!) {
-         repository(owner: $owner, name: $repo) {
-           pullRequest(number: $pr_number) {
-             state
-             reviewDecision
-             reviews(first: 100) {
-               nodes {
-                 state
-                 comments(first: 100) {
-                   nodes {
-                     body
-                     state
-                   }
-                 }
-               }
-             }
-           }
-         }
-       }
-     ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
-     ```
-  2. レビューが承認されていない場合は、以下のコマンドを実行
-     ```bash
-     sleep 30
-     ```
-     その後、再度手順1を実行
-  3. CIの状態を以下のコマンドで確認
-     ```bash
-     gh api graphql -f query='
-       query($owner: String!, $repo: String!, $pr_number: Int!) {
-         repository(owner: $owner, name: $repo) {
-           pullRequest(number: $pr_number) {
-             commits(last: 1) {
-               nodes {
-                 commit {
-                   statusCheckRollup {
-                     state
-                   }
-                 }
-               }
-             }
-           }
-         }
-       }
-     ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
-     ```
-  4. CIが成功していない場合は、以下のコマンドを実行
-     ```bash
-     sleep 30
-     ```
-     その後、再度手順3を実行
-  5. レビューが承認され、CIが成功したら、GitHub Web UIからマージを実行
-     - ghコマンド経由でのマージは禁止
-     - 必ず手動でマージを実行し、変更内容を最終確認
-  6. マージ完了後、以下のコマンドを実行してmainブランチを更新
-     ```bash
-     git switch main && git pull origin main
-     ```
-- レビュー監視手順
-  1. プッシュ完了後、以下のコマンドでレビュー状態を確認
-     ```bash
-     gh api graphql -f query='
-       query($owner: String!, $repo: String!, $pr_number: Int!) {
-         repository(owner: $owner, name: $repo) {
-           pullRequest(number: $pr_number) {
-             state
-             reviewDecision
-             reviews(first: 100) {
-               nodes {
-                 state
-                 comments(first: 100) {
-                   nodes {
-                     body
-                     state
-                   }
-                 }
-               }
-             }
-           }
-         }
-       }
-     ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
-     ```
-  2. CIの状態を確認
-     ```bash
-     gh api graphql -f query='
-       query($owner: String!, $repo: String!, $pr_number: Int!) {
-         repository(owner: $owner, name: $repo) {
-           pullRequest(number: $pr_number) {
-             commits(last: 1) {
-               nodes {
-                 commit {
-                   statusCheckRollup {
-                     state
-                   }
-                 }
-               }
-             }
-           }
-         }
-       }
-     ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
-     ```
-  3. レビューまたはCIが完了していない場合
-     ```bash
-     sleep 30
-     ```
-     その後、手順1-2を再実行
-  4. レビューコメントがある場合
-     - 修正を実施
-     - コミットとプッシュ
-     - コメントに返信（修正内容とコミットハッシュを含める）
-     - CIの完了を待って、コメントをresolveに変更
-  5. すべてのチェックが完了するまで3-4を繰り返す
 
 ## プロジェクト構造
 - ファイル構成
@@ -391,11 +273,7 @@
        }
      ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
      ```
-  2. コメントへの対応
-     - 修正内容を実装
-     - コミットとプッシュ
-     - コメントに返信（修正内容とコミットハッシュを含める）
-  3. CIの状態確認
+  2. CIの状態確認
      ```bash
      gh api graphql -f query='
        query($owner: String!, $repo: String!, $pr_number: Int!) {
@@ -415,7 +293,20 @@
        }
      ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
      ```
-  4. 必要に応じて再度修正
+  3. レビューまたはCIが完了していない場合
+     ```bash
+     sleep 30
+     ```
+     その後、手順1-2を再実行
+  4. レビューコメントがある場合
+     - 修正内容を実装
+     - コミットとプッシュ
+     - コメントに返信（修正内容とコミットハッシュを含める）
+     - CIの完了を待って、コメントをresolveに変更
+  5. すべてのチェックが完了するまで3-4を繰り返す
+  6. レビューが承認され、CIが成功したら、GitHub Web UIからマージを実行
+     - ghコマンド経由でのマージは禁止
+     - 必ず手動でマージを実行し、変更内容を最終確認
 
 - レビュー用PRマージ後の後始末
   1. mainブランチに切り替え
