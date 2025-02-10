@@ -131,6 +131,21 @@
   4. 失敗時は `gh run view` でログを確認して対応
   5. すべてのチェックがパスするまで2-3を繰り返す
   6. 成功したらPRをマージしてmainブランチを更新
+- PRマージ監視手順
+  1. 以下のコマンドでPRの状態を30秒ごとに確認
+     ```bash
+     while true; do
+       status=$(gh pr view $PR_NUMBER --json state -q .state)
+       echo "PR status: $status"
+       if [ "$status" = "MERGED" ]; then
+         echo "PR has been merged. Switching to main branch..."
+         git switch main && git pull origin main
+         break
+       fi
+       sleep 30
+     done
+     ```
+  2. マージされたら自動的にmainブランチに切り替わり、最新の変更を取得
 
 ## Next.jsアプリケーションルール
 - App Router規約に従ったファイル配置
