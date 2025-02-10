@@ -161,16 +161,54 @@
 - PRマージ監視手順
   1. レビューを依頼後、以下のコマンドを実行してレビュー状態を確認
      ```bash
-     sleep 30 && gh pr view $PR_NUMBER --json reviewDecision -q .reviewDecision
+     gh api graphql -f query='
+       query($owner: String!, $repo: String!, $pr_number: Int!) {
+         repository(owner: $owner, name: $repo) {
+           pullRequest(number: $pr_number) {
+             state
+             reviewDecision
+             reviews(first: 100) {
+               nodes {
+                 state
+                 comments(first: 100) {
+                   nodes {
+                     body
+                     state
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
      ```
-  2. レビューが承認されていない場合は、再度手順1を実行
-  3. レビュー承認後、手動でPRをマージ
-  4. マージ後、以下のコマンドを実行してマージ完了を確認
+  2. レビューが承認されていない場合は、30秒待って再度手順1を実行
+  3. CIの状態を以下のコマンドで確認
      ```bash
-     sleep 30 && gh pr view $PR_NUMBER --json state -q .state
+     gh api graphql -f query='
+       query($owner: String!, $repo: String!, $pr_number: Int!) {
+         repository(owner: $owner, name: $repo) {
+           pullRequest(number: $pr_number) {
+             commits(last: 1) {
+               nodes {
+                 commit {
+                   statusCheckRollup {
+                     state
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
      ```
-  5. 状態が`MERGED`でない場合は、再度手順4を実行
-  6. 状態が`MERGED`になったら以下を実行
+  4. CIが成功していない場合は、30秒待って再度手順3を実行
+  5. レビューが承認され、CIが成功したら、GitHub Web UIからマージを実行
+     - ghコマンド経由でのマージは禁止
+     - 必ず手動でマージを実行し、変更内容を最終確認
+  6. マージ完了後、以下のコマンドを実行してmainブランチを更新
      ```bash
      git switch main && git pull origin main
      ```
