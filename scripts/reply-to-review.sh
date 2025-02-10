@@ -2,34 +2,21 @@
 
 # 引数の確認
 if [ "$#" -lt 2 ]; then
-  echo "Usage: $0 <pr-number> <comment-id> [message] [commit-hash]"
-  echo "Example: $0 11 1948362971 \"修正しました\" abc1234"
+  echo "Usage: $0 <comment-id> <message>"
+  echo "Example: $0 1948362971 \"修正しました\""
   exit 1
 fi
 
-PR_NUMBER=$1
-COMMENT_ID=$2
-MESSAGE=${3:-""}
-COMMIT_HASH=${4:-""}
+COMMENT_ID=$1
+MESSAGE=$2
 
 # リポジトリ情報の取得
 OWNER=$(gh repo view --json owner -q .owner.login)
 REPO=$(gh repo view --json name -q .name)
-
-# メッセージが指定されていない場合は入力を求める
-if [ -z "$MESSAGE" ]; then
-  echo "✏️  Enter your reply message:"
-  read -r MESSAGE
-fi
-
-# コミットハッシュが指定されていない場合は入力を求める
-if [ -z "$COMMIT_HASH" ]; then
-  echo "🔍 Enter the commit hash for the fix:"
-  read -r COMMIT_HASH
-fi
+PR_NUMBER=$(gh pr view --json number -q .number)
 
 # リプライメッセージの作成（JSONフォーマットで改行を保持）
-FULL_MESSAGE="$MESSAGE\n\n修正コミット: $COMMIT_HASH"
+FULL_MESSAGE="$MESSAGE"
 
 # リプライの送信
 echo "💬 Sending reply to comment $COMMENT_ID..."
