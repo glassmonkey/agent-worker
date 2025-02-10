@@ -214,22 +214,17 @@
 
 ## 作業手順
 - 作業の準備
-  1. mainブランチの更新
+  1. 作業を開始する
      ```bash
-     git fetch origin main
-     git switch main
-     git pull origin main
+     make start-work branch=<branch-name>
      ```
-  2. `.work`ディレクトリの掃除
-     ```bash
-     rm -rf .work/*
-     ```
-  3. 作業用ブランチの作成
      - ブランチ名は作業内容を表す名前をつける
      - 例: `feature/add-user-auth`, `fix/login-error`
-     ```bash
-     git checkout -b <branch-name>
-     ```
+     - このコマンドは以下を自動的に実行
+       - mainブランチの更新
+       - `.work`ディレクトリの掃除
+       - 作業用ブランチの作成
+       - PR下書きの準備
 
 - 作業の実施
   1. 作業内容の実装
@@ -322,3 +317,19 @@
      ```bash
      git branch -d <branch-name>
      ```
+
+- 作業の完了
+  1. 作業を終了する
+     ```bash
+     make end-work
+     ```
+     - このコマンドは以下を自動的に実行
+       - 変更の確認
+       - `.work`ディレクトリの掃除
+       - mainブランチへの切り替え
+
+## 基本方針
+- 指示があったことは必ずルールに反映する
+- ルール内の手順に失敗したら、修正を行う。修正結果はルールに反映する。
+- コードを操作するときは必ず作業手順に従う
+- コマンドの実行は可能な限りMakefile経由で行う
