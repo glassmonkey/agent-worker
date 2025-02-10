@@ -5,11 +5,6 @@
 - 拡張子固有のルールは`.cursor/rules`ディレクトリ以下に追記する
 - 追記する際は、関連する既存のセクションに追加するか、新しいセクションを作成する
 - 追記後は必ずコミットし、CIの成功を確認する
-- 手順に修正を加える場合は、必ず関連するルールも更新する
-  1. 手順の修正内容を確認
-  2. 影響を受けるルールを特定
-  3. ルールの更新が必要な場合は、該当セクションを修正
-  4. 変更をコミットし、PRを作成
 - 手順の誤りが発見された場合の修正プロセス
   1. レビューコメントで指摘された誤りを確認
   2. 修正内容を実装
@@ -151,71 +146,15 @@
       - CIの状態
     - マージ後は自動的にmainブランチに切り替え
   - レビューコメントへの返信
-    1. レビューコメントに直接リプライする形式で返信
-     - コメントIDを取得
-       ```bash
-       gh api graphql -f query='
-         query($owner: String!, $repo: String!, $pr_number: Int!) {
-           repository(owner: $owner, name: $repo) {
-             pullRequest(number: $pr_number) {
-               reviews(first: 100) {
-                 nodes {
-                   comments(first: 100) {
-                     nodes {
-                       id
-                       databaseId
-                     }
-                   }
-                 }
-               }
-             }
-           }
-         }
-       ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
-       ```
-     - リプライを送信（JSONフォーマットで改行を保持）
-       ```bash
-       echo '{"body": "修正内容の説明\n\n修正コミット: コミットハッシュ"}' | \
-       gh api \
-         --method POST \
-         -H "Accept: application/vnd.github+json" \
-         /repos/$OWNER/$REPO/pulls/$PR_NUMBER/comments/$COMMENT_ID/replies \
-         --input -
-       ```
-  3. CIの状態確認
-     ```bash
-     gh api graphql -f query='
-       query($owner: String!, $repo: String!, $pr_number: Int!) {
-         repository(owner: $owner, name: $repo) {
-           pullRequest(number: $pr_number) {
-             commits(last: 1) {
-               nodes {
-                 commit {
-                   statusCheckRollup {
-                     state
-                   }
-                 }
-               }
-             }
-           }
-         }
-       }
-     ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
-     ```
-  4. レビューまたはCIが完了していない場合
-     ```bash
-     sleep 30
-     ```
-     その後、手順1-3を再実行
-  5. レビューコメントがある場合
-     - 修正内容を実装
-     - コミットとプッシュ
-     - コメントに返信（修正内容とコミットハッシュを含める）
-     - CIの完了を待って、コメントをresolveに変更
-  6. すべてのチェックが完了するまで3-4を繰り返す
-  7. レビューが承認され、CIが成功したら、GitHub Web UIからマージを実行
-     - ghコマンド経由でのマージは禁止
-     - 必ず手動でマージを実行し、変更内容を最終確認
+    - レビューコメントに直接リプライする形式で返信
+    - `./scripts/reply-to-review.sh <pr-number> <comment-id> [message] [commit-hash]`を使用
+  - レビュー完了の確認
+    - すべてのコメントがresolveされていることを確認
+    - CIが成功していることを確認
+    - コンフリクトが解消されていることを確認
+  - マージの実行
+    - GitHub Web UIからマージを実行（ghコマンド経由でのマージは禁止）
+    - マージ前に変更内容を最終確認
 
 ## CI/CD
 - GitHub Actionsを使用して以下を自動化
