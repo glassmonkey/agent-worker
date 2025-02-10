@@ -1,4 +1,4 @@
-.PHONY: init install dev build test lint type-check clean help start-work finish-work end-work
+.PHONY: init install dev build test lint type-check clean help start-work finish-work end-work monitor-pr
 
 # デフォルトのターゲット
 .DEFAULT_GOAL := help
@@ -99,6 +99,11 @@ finish-work: ## PRを作成し、作業を終了する
 	@echo "🧹 Cleaning .work directory..."
 	@rm -rf .work/*
 	@echo "✨ Work completed successfully!"
+
+# レビューの監視
+monitor-pr: ## PRのレビュー状態とCIを監視する
+	@echo "👀 Monitoring PR status..."
+	@./scripts/monitor-pr.sh
 
 # ヘルプの表示
 help: ## このヘルプメッセージを表示する
