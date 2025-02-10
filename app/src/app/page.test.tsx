@@ -3,31 +3,45 @@ import userEvent from '@testing-library/user-event'
 import Home from './page'
 
 describe('Home', () => {
-  it('renders counter with initial value of 0', () => {
+  it('renders header with title', () => {
     render(<Home />)
-    const counter = screen.getByRole('heading', { name: /counter/i })
-    expect(counter).toHaveTextContent('Counter: 0')
+    const header = screen.getByRole('heading', { name: /home/i })
+    expect(header).toBeInTheDocument()
   })
 
-  it('increments counter when increment button is clicked', async () => {
-    const user = userEvent.setup()
+  it('renders message input form', () => {
     render(<Home />)
-    const incrementButton = screen.getByRole('button', { name: /increment/i })
+    const textarea = screen.getByPlaceholderText("What's happening?")
+    const submitButton = screen.getByRole('button', { name: /post/i })
     
-    await user.click(incrementButton)
-    
-    const counter = screen.getByRole('heading', { name: /counter/i })
-    expect(counter).toHaveTextContent('Counter: 1')
+    expect(textarea).toBeInTheDocument()
+    expect(submitButton).toBeInTheDocument()
+    expect(submitButton).toBeDisabled()
   })
 
-  it('decrements counter when decrement button is clicked', async () => {
+  it('enables submit button when message is not empty', async () => {
     const user = userEvent.setup()
     render(<Home />)
-    const decrementButton = screen.getByRole('button', { name: /decrement/i })
     
-    await user.click(decrementButton)
+    const textarea = screen.getByPlaceholderText("What's happening?")
+    const submitButton = screen.getByRole('button', { name: /post/i })
     
-    const counter = screen.getByRole('heading', { name: /counter/i })
-    expect(counter).toHaveTextContent('Counter: -1')
+    await user.type(textarea, 'Hello, World!')
+    expect(submitButton).toBeEnabled()
+  })
+
+  it('posts a new message when form is submitted', async () => {
+    const user = userEvent.setup()
+    render(<Home />)
+    
+    const textarea = screen.getByPlaceholderText("What's happening?")
+    const submitButton = screen.getByRole('button', { name: /post/i })
+    
+    await user.type(textarea, 'Hello, World!')
+    await user.click(submitButton)
+    
+    const message = screen.getByText('Hello, World!')
+    expect(message).toBeInTheDocument()
+    expect(textarea).toHaveValue('')
   })
 }) 
