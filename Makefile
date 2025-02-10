@@ -76,14 +76,14 @@ start-work: ## 作業用ブランチを作成し、作業環境を準備する
 	@echo "✨ Work environment initialized successfully!"
 	@echo "📝 PR draft created at .work/pr-draft.md"
 
-# 作業終了
-finish-work: ## PRを作成し、作業を終了する
+# PR作成
+submit-work: ## 作業内容をプッシュしてPRを作成する
 	@if [ -z "$(title)" ]; then \
-		echo "Usage: make finish-work title=<pr-title>"; \
-		echo "Example: make finish-work title=\"feat: カウンター機能の追加\""; \
+		echo "Usage: make submit-work title=<pr-title>"; \
+		echo "Example: make submit-work title=\"feat: カウンター機能の追加\""; \
 		exit 1; \
 	fi
-	@echo "🏁 Finishing work with PR title: $(title)..."
+	@echo "🏁 Submitting work with PR title: $(title)..."
 	@if [ ! -f .work/pr-draft.md ]; then \
 		echo "⚠️  PR draft file not found at .work/pr-draft.md"; \
 		exit 1; \
@@ -96,8 +96,19 @@ finish-work: ## PRを作成し、作業を終了する
 	@echo "📤 Creating PR..."
 	@gh pr create --repo $$(git remote get-url origin | sed 's/.*://; s/\.git$$//') --title "$(title)" --body-file .work/pr-draft.md
 	@echo "✨ PR created successfully!"
+
+# 作業完了
+finish-work: ## レビュー通過後の作業を完了する
+	@echo "🔍 Checking PR status..."
+	@./scripts/monitor-pr.sh --check-only || exit 1
 	@echo "🧹 Cleaning .work directory..."
 	@rm -rf .work/*
+	@echo "🔄 Switching to main branch..."
+	@git switch main
+	@echo "🔄 Updating main branch..."
+	@git pull origin main
+	@echo "🗑️  Deleting work branch..."
+	@git branch -d $$(git rev-parse --abbrev-ref HEAD)
 	@echo "✨ Work completed successfully!"
 
 # レビューの監視
