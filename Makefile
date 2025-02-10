@@ -113,17 +113,8 @@ submit-work: ## 作業内容をプッシュしてPRを作成する
 .PHONY: finish-work
 # 作業完了
 finish-work: ## レビュー通過後の作業を完了する
-	@echo "🔍 Checking PR status..."
-	@./scripts/monitor-pr.sh --check-only || exit 1
-	@echo "🧹 Cleaning .work directory..."
-	@rm -rf .work/*
-	@echo "🔄 Switching to main branch..."
-	@git switch main
-	@echo "🔄 Updating main branch..."
-	@git pull origin main
-	@echo "🗑️  Deleting work branch..."
-	@git branch -d $$(git rev-parse --abbrev-ref HEAD)
-	@echo "✨ Work completed successfully!"
+	@echo "🧹 Running post-merge cleanup..."
+	@./scripts/finish-work.sh
 
 .PHONY: monitor-pr
 # レビューの監視

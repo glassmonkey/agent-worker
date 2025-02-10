@@ -60,4 +60,45 @@ fi
 
 # PRの監視を開始
 echo "👀 Starting PR monitoring..."
-./scripts/monitor-pr.sh 
+./scripts/monitor-pr.sh
+
+# 終了コード
+# 0: 正常終了
+# 1: エラー発生
+
+echo "🧹 Starting post-merge cleanup..."
+
+# mainブランチに切り替え
+echo "🔄 Switching to main branch..."
+git switch main || {
+  echo "❌ Failed to switch to main branch"
+  exit 1
+}
+
+# mainブランチを最新に更新
+echo "🔄 Updating main branch..."
+git pull origin main || {
+  echo "❌ Failed to update main branch"
+  exit 1
+}
+
+# 作業ブランチの取得
+WORK_BRANCH=$(git branch --show-current)
+if [ "$WORK_BRANCH" != "main" ]; then
+  # 作業ブランチの削除
+  echo "🗑️  Deleting work branch..."
+  git branch -d "$WORK_BRANCH" || {
+    echo "❌ Failed to delete work branch"
+    exit 1
+  }
+fi
+
+# .workディレクトリの掃除
+echo "🧹 Cleaning up .work directory..."
+rm -rf .work/* || {
+  echo "❌ Failed to clean .work directory"
+  exit 1
+}
+
+echo "✨ Post-merge cleanup completed successfully!"
+exit 0 
