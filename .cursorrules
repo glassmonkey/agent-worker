@@ -225,6 +225,62 @@
      ```bash
      git switch main && git pull origin main
      ```
+- レビュー監視手順
+  1. プッシュ完了後、以下のコマンドでレビュー状態を確認
+     ```bash
+     gh api graphql -f query='
+       query($owner: String!, $repo: String!, $pr_number: Int!) {
+         repository(owner: $owner, name: $repo) {
+           pullRequest(number: $pr_number) {
+             state
+             reviewDecision
+             reviews(first: 100) {
+               nodes {
+                 state
+                 comments(first: 100) {
+                   nodes {
+                     body
+                     state
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
+     ```
+  2. CIの状態を確認
+     ```bash
+     gh api graphql -f query='
+       query($owner: String!, $repo: String!, $pr_number: Int!) {
+         repository(owner: $owner, name: $repo) {
+           pullRequest(number: $pr_number) {
+             commits(last: 1) {
+               nodes {
+                 commit {
+                   statusCheckRollup {
+                     state
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
+     ```
+  3. レビューまたはCIが完了していない場合
+     ```bash
+     sleep 30
+     ```
+     その後、手順1-2を再実行
+  4. レビューコメントがある場合
+     - 修正を実施
+     - コミットとプッシュ
+     - コメントに返信（修正内容とコミットハッシュを含める）
+     - CIの完了を待って、コメントをresolveに変更
+  5. すべてのチェックが完了するまで3-4を繰り返す
 
 ## プロジェクト構造
 - ファイル構成
