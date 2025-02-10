@@ -98,19 +98,19 @@ if [ ! -z "$UNRESOLVED_THREADS" ]; then
 fi
 
 # LGTMコメントを確認
-LGTM_COMMENT=$(echo "$PR_STATUS" | jq -r '.data.repository.pullRequest.comments.nodes[].body' | grep -i "lgtm")
-if [ ! -z "$LGTM_COMMENT" ]; then
-  # LGTMコメントの日時を取得
-  LGTM_TIMESTAMP=$(echo "$PR_STATUS" | jq -r '.data.repository.pullRequest.comments.nodes[] | select(.body | test("(?i)lgtm")) | .createdAt')
+LGTM_COMMENTS=$(echo "$PR_STATUS" | jq -r '.data.repository.pullRequest.comments.nodes[] | select(.body | test("(?i)lgtm")) | {body: .body, createdAt: .createdAt}')
+if [ ! -z "$LGTM_COMMENTS" ]; then
+  # 最新のLGTMコメントの日時を取得
+  LATEST_LGTM_TIMESTAMP=$(echo "$LGTM_COMMENTS" | jq -r '.createdAt' | sort -r | head -n 1)
   
   # 最新のコミットの日時を取得
   LATEST_COMMIT_TIMESTAMP=$(echo "$PR_STATUS" | jq -r '.data.repository.pullRequest.commits.nodes[0].commit.committedDate')
   
   # タイムスタンプを比較
-  if [[ "$LATEST_COMMIT_TIMESTAMP" > "$LGTM_TIMESTAMP" ]]; then
-    echo "⚠️ There are commits after the LGTM comment. The LGTM comment will be ignored."
+  if [[ "$LATEST_COMMIT_TIMESTAMP" > "$LATEST_LGTM_TIMESTAMP" ]]; then
+    echo "⚠️ There are commits after the latest LGTM comment. The LGTM comment will be ignored."
   elif [ "$CI_STATUS" = "SUCCESS" ]; then
-    echo "🎉 LGTM comment found and all checks passed. Ready to merge!"
+    echo "🎉 Latest LGTM comment found and all checks passed. Ready to merge!"
     exit 5
   fi
 fi
