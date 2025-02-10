@@ -132,8 +132,11 @@
   5. すべてのチェックがパスするまで2-3を繰り返す
   6. 成功したらPRをマージしてmainブランチを更新
 - PRマージ監視手順
-  1. `gh pr view $PR_NUMBER --json state -q .state`でPRの状態を確認
-  2. 状態が`MERGED`でない場合は、30秒待って再度確認
+  1. PRの作成が完了したら、以下のコマンドを実行
+     ```bash
+     sleep 30 && gh pr view $PR_NUMBER --json state -q .state
+     ```
+  2. 状態が`MERGED`でない場合は、再度手順1を実行
   3. 状態が`MERGED`になったら以下を実行
      ```bash
      git switch main && git pull origin main
