@@ -1,4 +1,4 @@
-.PHONY: init install dev build test lint type-check clean help
+.PHONY: init install dev build test lint type-check clean help start-work finish-work
 
 # デフォルトのターゲット
 .DEFAULT_GOAL := help
@@ -52,6 +52,26 @@ clean: ## ビルドファイルとキャッシュを削除する
 	@echo "🧹 Cleaning up..."
 	@cd $(APP_DIR) && rm -rf .next out node_modules
 	@echo "✨ Cleanup completed!"
+
+# 作業開始
+start-work: ## 作業用ブランチを作成し、作業環境を準備する
+	@if [ -z "$(branch)" ]; then \
+		echo "Usage: make start-work branch=<branch-name>"; \
+		echo "Example: make start-work branch=feature/add-counter"; \
+		exit 1; \
+	fi
+	@echo "🚀 Starting work on branch: $(branch)..."
+	@./scripts/start-work.sh "$(branch)"
+
+# 作業終了
+finish-work: ## PRを作成し、作業を終了する
+	@if [ -z "$(title)" ]; then \
+		echo "Usage: make finish-work title=<pr-title>"; \
+		echo "Example: make finish-work title=\"feat: カウンター機能の追加\""; \
+		exit 1; \
+	fi
+	@echo "🏁 Finishing work with PR title: $(title)..."
+	@./scripts/finish-work.sh "$(title)"
 
 # ヘルプの表示
 help: ## このヘルプメッセージを表示する
