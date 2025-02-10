@@ -19,36 +19,7 @@
   3. 修正をコミット
   4. レビューコメントに返信
      - レビューコメントに直接リプライする形式で返信
-     - コメントIDを取得
-       ```bash
-       gh api graphql -f query='
-         query($owner: String!, $repo: String!, $pr_number: Int!) {
-           repository(owner: $owner, name: $repo) {
-             pullRequest(number: $pr_number) {
-               reviews(first: 100) {
-                 nodes {
-                   comments(first: 100) {
-                     nodes {
-                       id
-                       databaseId
-                     }
-                   }
-                 }
-               }
-             }
-           }
-         }
-       ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
-       ```
-     - リプライを送信（JSONフォーマットで改行を保持）
-       ```bash
-       echo '{"body": "修正内容の説明\n\n修正コミット: コミットハッシュ"}' | \
-       gh api \
-         --method POST \
-         -H "Accept: application/vnd.github+json" \
-         /repos/$OWNER/$REPO/pulls/$PR_NUMBER/comments/$COMMENT_ID/replies \
-         --input -
-       ```
+     - `./scripts/reply-to-review.sh <pr-number> <comment-id> [message] [commit-hash]`を使用
   5. CIの完了を待って、コメントをresolveに変更
   6. 必要に応じて手順2-5を繰り返す
 
@@ -342,7 +313,7 @@
      ```
 
 - レビュー用PRの監視および対応
-  1. レビューコメントの監視
+  1. レビューコメントとCIの監視
      ```bash
      ./scripts/monitor-pr.sh
      ```
@@ -350,79 +321,27 @@
        - PRの状態（OPEN/MERGED/CLOSED）
        - レビューコメント
        - CIの状態
-     - CIの状態確認手順
-       1. プッシュ後、`gh run list --workflow="PR Check CI" --limit 1` で状態を確認
-       2. `sleep 30` コマンドで30秒待機
-       3. 再度 `gh run list` で確認
-       4. 失敗時は `gh run view` でログを確認して対応
-       5. すべてのチェックがパスするまで2-3を繰り返す
+     - CIの状態確認
+       - 成功: 次のステップに進む
+       - 失敗: ログを確認して対応
+       - 実行中: 完了まで待機
      - マージ後は自動的にmainブランチに切り替え
-  2. レビューコメントへの返信
-     - レビューコメントに直接リプライする形式で返信
-     - コメントIDを取得
-       ```bash
-       gh api graphql -f query='
-         query($owner: String!, $repo: String!, $pr_number: Int!) {
-           repository(owner: $owner, name: $repo) {
-             pullRequest(number: $pr_number) {
-               reviews(first: 100) {
-                 nodes {
-                   comments(first: 100) {
-                     nodes {
-                       id
-                       databaseId
-                     }
-                   }
-                 }
-               }
-             }
-           }
-         }
-       ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
-       ```
-     - リプライを送信（JSONフォーマットで改行を保持）
-       ```bash
-       echo '{"body": "修正内容の説明\n\n修正コミット: コミットハッシュ"}' | \
-       gh api \
-         --method POST \
-         -H "Accept: application/vnd.github+json" \
-         /repos/$OWNER/$REPO/pulls/$PR_NUMBER/comments/$COMMENT_ID/replies \
-         --input -
-       ```
-  3. CIの状態確認
-     ```bash
-     gh api graphql -f query='
-       query($owner: String!, $repo: String!, $pr_number: Int!) {
-         repository(owner: $owner, name: $repo) {
-           pullRequest(number: $pr_number) {
-             commits(last: 1) {
-               nodes {
-                 commit {
-                   statusCheckRollup {
-                     state
-                   }
-                 }
-               }
-             }
-           }
-         }
-       }
-     ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
-     ```
-  4. レビューまたはCIが完了していない場合
-     ```bash
-     sleep 30
-     ```
-     その後、手順1-3を再実行
-  5. レビューコメントがある場合
-     - 修正内容を実装
-     - コミットとプッシュ
-     - コメントに返信（修正内容とコミットハッシュを含める）
-     - CIの完了を待って、コメントをresolveに変更
-  6. すべてのチェックが完了するまで3-4を繰り返す
-  7. レビューが承認され、CIが成功したら、GitHub Web UIからマージを実行
-     - ghコマンド経由でのマージは禁止
-     - 必ず手動でマージを実行し、変更内容を最終確認
+  2. レビューコメントへの対応
+     - 修正が必要な場合
+       1. 修正内容を実装
+       2. コミットとプッシュ
+       3. `./scripts/reply-to-review.sh`でコメントに返信
+       4. CIの完了を待って、コメントをresolveに変更
+     - 説明が必要な場合
+       1. `./scripts/reply-to-review.sh`で説明を返信
+       2. コメントをresolveに変更
+  3. レビュー完了の確認
+     - すべてのコメントがresolveされていることを確認
+     - CIが成功していることを確認
+     - コンフリクトが解消されていることを確認
+  4. マージの実行
+     - GitHub Web UIからマージを実行（ghコマンド経由でのマージは禁止）
+     - マージ前に変更内容を最終確認
 
 - レビュー用PRマージ後の後始末
   1. mainブランチに切り替え
