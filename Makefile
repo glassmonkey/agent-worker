@@ -1,4 +1,4 @@
-.PHONY: init install dev build test lint type-check clean help start-work finish-work end-work monitor-pr reply-to-review
+.PHONY: init install dev build test lint type-check clean help start-work finish-work end-work monitor-pr reply-to-review push-work
 
 # デフォルトのターゲット
 .DEFAULT_GOAL := help
@@ -126,6 +126,14 @@ reply-to-review: ## レビューコメントに返信する
 	@echo "💬 Replying to comment $(comment_id)..."
 	@./scripts/reply-to-review.sh $(comment_id) "$(message)"
 	@echo "✨ Reply sent successfully!"
+
+# 変更のプッシュ
+push-work: ## 変更をプッシュしてPRを監視する
+	@echo "🚀 Pushing changes..."
+	@BRANCH=$$(git rev-parse --abbrev-ref HEAD); \
+	git push origin $$BRANCH
+	@echo "👀 Starting PR monitoring..."
+	@$(MAKE) monitor-pr
 
 # ヘルプの表示
 help: ## このヘルプメッセージを表示する
