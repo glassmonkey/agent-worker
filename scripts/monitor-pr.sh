@@ -115,10 +115,10 @@ if [ ! -z "$LGTM_COMMENTS" ]; then
   fi
 fi
 
-# すべてのチェックが通過
+# CIの状態を確認
 if [ "$CI_STATUS" = "SUCCESS" ]; then
-  echo "✅ All checks passed. PR is ready to be merged"
-  exit 0
+  echo "⏳ Waiting for LGTM comment"
+  exit 1
 else
   echo "⏳ Waiting for CI checks to complete"
   exit 1
