@@ -1,4 +1,4 @@
-.PHONY: init install dev build test lint type-check clean help start-work finish-work
+.PHONY: init install dev build test lint type-check clean help start-work finish-work end-work
 
 # デフォルトのターゲット
 .DEFAULT_GOAL := help
@@ -61,7 +61,20 @@ start-work: ## 作業用ブランチを作成し、作業環境を準備する
 		exit 1; \
 	fi
 	@echo "🚀 Starting work on branch: $(branch)..."
-	@./scripts/start-work.sh "$(branch)"
+	@echo "🔄 Updating main branch..."
+	@git fetch origin main
+	@git switch main
+	@git pull origin main
+	@echo "🧹 Cleaning .work directory..."
+	@rm -rf .work/*
+	@echo "🌱 Creating work branch: $(branch)..."
+	@git checkout -b $(branch)
+	@echo "📁 Preparing .work directory..."
+	@mkdir -p .work
+	@echo "📝 Creating PR draft..."
+	@touch .work/pr-draft.md
+	@echo "✨ Work environment initialized successfully!"
+	@echo "📝 PR draft created at .work/pr-draft.md"
 
 # 作業終了
 finish-work: ## PRを作成し、作業を終了する
@@ -79,3 +92,16 @@ help: ## このヘルプメッセージを表示する
 	@echo ""
 	@echo "Targets:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}' 
+
+# 作業終了
+end-work:
+	@echo "🔍 Checking for uncommitted changes..."
+	@if [ -n "$$(git status --porcelain)" ]; then \
+		echo "⚠️  You have uncommitted changes. Please commit or stash them first."; \
+		exit 1; \
+	fi
+	@echo "🧹 Cleaning .work directory..."
+	@rm -rf .work/*
+	@echo "🔄 Switching to main branch..."
+	@git switch main
+	@echo "✨ Work completed successfully!"
