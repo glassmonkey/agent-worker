@@ -17,4 +17,7 @@ const customJestConfig = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-} 
+}
+
+// createJestConfigを定義して、それをモジュールとしてエクスポート
+module.exports = createJestConfig(customJestConfig) 
