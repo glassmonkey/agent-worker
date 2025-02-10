@@ -15,8 +15,12 @@ OWNER=$(gh repo view --json owner -q .owner.login)
 REPO=$(gh repo view --json name -q .name)
 PR_NUMBER=$(gh pr view --json number -q .number)
 
+# 最新のコミットハッシュを取得
+COMMIT_HASH=$(git rev-parse HEAD)
+COMMIT_URL="https://github.com/$OWNER/$REPO/commit/$COMMIT_HASH"
+
 # リプライメッセージの作成（JSONフォーマットで改行を保持）
-FULL_MESSAGE="$MESSAGE"
+FULL_MESSAGE="$MESSAGE\n\n修正コミット: $COMMIT_URL"
 
 # リプライの送信
 echo "💬 Sending reply to comment $COMMENT_ID..."
