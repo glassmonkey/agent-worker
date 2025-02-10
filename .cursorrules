@@ -5,6 +5,23 @@
 - App Routerを採用
 - TypeScriptとTailwind CSSを使用
 
+## Makefileコマンド
+- `make init`: プロジェクトの初期化
+  - npm installの実行
+  - huskyの準備
+  - GitHub CLI（gh）のインストール（未インストールの場合）
+    - macOS: Homebrewを使用
+    - Debian/Ubuntu: aptを使用
+    - RHEL/Fedora: dnfを使用
+- `make install`: 依存関係のインストール
+- `make dev`: 開発サーバーの起動
+- `make build`: プロダクションビルドの実行
+- `make test`: テストの実行
+- `make lint`: リントの実行
+- `make type-check`: 型チェックの実行
+- `make clean`: ビルドファイルとキャッシュの削除
+- `make help`: 利用可能なコマンドの一覧表示
+
 ## Gitルール
 - コミットメッセージは Conventional Commits 形式に従う
   - feat: 新機能の追加
