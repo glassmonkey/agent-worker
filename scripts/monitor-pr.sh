@@ -34,6 +34,7 @@ PR_STATUS=$(gh api graphql -f query='
               statusCheckRollup {
                 state
               }
+              committedDate
             }
           }
         }
@@ -51,6 +52,7 @@ PR_STATUS=$(gh api graphql -f query='
         comments(last: 100) {
           nodes {
             body
+            createdAt
           }
         }
       }
@@ -97,9 +99,20 @@ fi
 
 # LGTMコメントを確認
 LGTM_COMMENT=$(echo "$PR_STATUS" | jq -r '.data.repository.pullRequest.comments.nodes[].body' | grep -i "lgtm")
-if [ ! -z "$LGTM_COMMENT" ] && [ "$CI_STATUS" = "SUCCESS" ]; then
-  echo "🎉 LGTM comment found and all checks passed. Ready to merge!"
-  exit 5
+if [ ! -z "$LGTM_COMMENT" ]; then
+  # LGTMコメントの日時を取得
+  LGTM_TIMESTAMP=$(echo "$PR_STATUS" | jq -r '.data.repository.pullRequest.comments.nodes[] | select(.body | test("(?i)lgtm")) | .createdAt')
+  
+  # 最新のコミットの日時を取得
+  LATEST_COMMIT_TIMESTAMP=$(echo "$PR_STATUS" | jq -r '.data.repository.pullRequest.commits.nodes[0].commit.committedDate')
+  
+  # タイムスタンプを比較
+  if [[ "$LATEST_COMMIT_TIMESTAMP" > "$LGTM_TIMESTAMP" ]]; then
+    echo "⚠️ There are commits after the LGTM comment. The LGTM comment will be ignored."
+  elif [ "$CI_STATUS" = "SUCCESS" ]; then
+    echo "🎉 LGTM comment found and all checks passed. Ready to merge!"
+    exit 5
+  fi
 fi
 
 # すべてのチェックが通過
@@ -167,6 +180,7 @@ while true; do
                   body
                   state
                   databaseId
+                  createdAt
                 }
               }
             }
@@ -177,6 +191,7 @@ while true; do
                 statusCheckRollup {
                   state
                 }
+                committedDate
               }
             }
           }
