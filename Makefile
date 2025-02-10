@@ -1,4 +1,4 @@
-.PHONY: init install dev build test lint type-check clean help start-work finish-work end-work monitor-pr
+.PHONY: init install dev build test lint type-check clean help start-work finish-work end-work monitor-pr reply-to-review
 
 # デフォルトのターゲット
 .DEFAULT_GOAL := help
@@ -115,6 +115,17 @@ finish-work: ## レビュー通過後の作業を完了する
 monitor-pr: ## PRのレビュー状態とCIを監視する
 	@echo "👀 Monitoring PR status..."
 	@./scripts/monitor-pr.sh
+
+# レビューコメントへの返信
+reply-to-review: ## レビューコメントに返信する
+	@if [ -z "$(comment_id)" ] || [ -z "$(message)" ]; then \
+		echo "Usage: make reply-to-review comment_id=<comment_id> message=<message>"; \
+		echo "Example: make reply-to-review comment_id=123456789 message=\"修正しました。\""; \
+		exit 1; \
+	fi
+	@echo "💬 Replying to comment $(comment_id)..."
+	@./scripts/reply-to-review.sh $(comment_id) "$(message)"
+	@echo "✨ Reply sent successfully!"
 
 # ヘルプの表示
 help: ## このヘルプメッセージを表示する

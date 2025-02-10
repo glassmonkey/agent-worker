@@ -23,7 +23,7 @@
   3. 修正をコミット
   4. フィードバックへの対応
      - レビューコメントの場合
-       1. `./scripts/reply-to-review.sh`でコメントに返信
+       1. `make reply-to-review comment_id=<comment_id> message="<message>"`でコメントに返信
        2. CIの完了を待って、コメントをresolveに変更
      - 指示の場合
        1. 指示の内容と対応結果を記録
@@ -171,10 +171,10 @@
        - 修正が必要な場合
          1. 修正内容を実装
          2. コミットとプッシュ
-         3. `./scripts/reply-to-review.sh`でコメントに返信
+         3. `make reply-to-review comment_id=<comment_id> message="<message>"`でコメントに返信
          4. CIの完了を待って、コメントをresolveに変更
        - 説明が必要な場合
-         1. `./scripts/reply-to-review.sh`で説明を返信
+         1. `make reply-to-review comment_id=<comment_id> message="<message>"`で説明を返信
          2. コメントをresolveに変更
        - レビュー完了の確認
          - すべてのコメントがresolveされていることを確認
@@ -296,10 +296,10 @@
      - 修正が必要な場合
        1. 修正内容を実装
        2. コミットとプッシュ
-       3. `./scripts/reply-to-review.sh`でコメントに返信
+       3. `make reply-to-review comment_id=<comment_id> message="<message>"`でコメントに返信
        4. CIの完了を待って、コメントをresolveに変更
      - 説明が必要な場合
-       1. `./scripts/reply-to-review.sh`で説明を返信
+       1. `make reply-to-review comment_id=<comment_id> message="<message>"`で説明を返信
        2. コメントをresolveに変更
   3. レビュー完了の確認
      - すべてのコメントがresolveされていることを確認
