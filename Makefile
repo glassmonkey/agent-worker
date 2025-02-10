@@ -135,12 +135,12 @@ monitor-pr: ## PRのレビュー状態とCIを監視する
 # レビューコメントへの返信
 reply-to-review: ## レビューコメントに返信する
 	@if [ -z "$(comment_id)" ] || [ -z "$(message)" ]; then \
-		echo "Usage: make reply-to-review comment_id=<comment_id> message=<message>"; \
-		echo "Example: make reply-to-review comment_id=123456789 message=\"修正しました。\""; \
+		echo "Usage: make reply-to-review comment_id=<comment_id> message=<message> [include_commit=true]"; \
+		echo "Example: make reply-to-review comment_id=123456789 message=\"修正しました。\" include_commit=true"; \
 		exit 1; \
 	fi
 	@echo "💬 Replying to comment $(comment_id)..."
-	@./scripts/reply-to-review.sh $(comment_id) "$(message)"
+	@./scripts/reply-to-review.sh $(comment_id) "$(message)" $(include_commit)
 	@echo "✨ Reply sent successfully!"
 
 .PHONY: help
