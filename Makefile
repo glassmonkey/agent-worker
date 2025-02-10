@@ -1,4 +1,4 @@
-.PHONY: init install dev build test lint type-check clean help start-work finish-work
+.PHONY: init install dev build test lint type-check clean help start-work finish-work end-work
 
 # デフォルトのターゲット
 .DEFAULT_GOAL := help
@@ -78,6 +78,19 @@ finish-work: ## PRを作成し、作業を終了する
 	@echo "📤 Creating PR..."
 	@gh pr create --repo $$(git remote get-url origin | sed 's/.*://; s/\.git$$//') --title "$(title)" --body-file .work/pr-draft.md
 	@echo "✨ PR created successfully!"
+
+# 作業終了
+end-work: ## 作業を終了し、mainブランチに戻る
+	@echo "🔍 Checking for uncommitted changes..."
+	@if [ -n "$$(git status --porcelain)" ]; then \
+		echo "⚠️  You have uncommitted changes. Please commit or stash them first."; \
+		exit 1; \
+	fi
+	@echo "🧹 Cleaning .work directory..."
+	@rm -rf .work/*
+	@echo "🔄 Switching to main branch..."
+	@git switch main
+	@echo "✨ Work completed successfully!"
 
 # ヘルプの表示
 help: ## このヘルプメッセージを表示する
