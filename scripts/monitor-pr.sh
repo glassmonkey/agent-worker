@@ -6,6 +6,7 @@
 # 2: 未解決のレビューコメントあり
 # 3: コンフリクトあり
 # 4: その他のエラー
+# 5: LGTMコメントあり、マージ可能
 
 # 引数からPR番号を取得
 PR_NUMBER=${1:-$(gh pr view --json number -q .number)}
@@ -45,6 +46,11 @@ PR_STATUS=$(gh api graphql -f query='
                 databaseId
               }
             }
+          }
+        }
+        comments(last: 100) {
+          nodes {
+            body
           }
         }
       }
@@ -87,6 +93,13 @@ if [ ! -z "$UNRESOLVED_THREADS" ]; then
   echo "$UNRESOLVED_THREADS" | jq -r '.comments.nodes[0].body'
   echo "Comment ID: $(echo "$UNRESOLVED_THREADS" | jq -r '.comments.nodes[0].databaseId')"
   exit 2
+fi
+
+# LGTMコメントを確認
+LGTM_COMMENT=$(echo "$PR_STATUS" | jq -r '.data.repository.pullRequest.comments.nodes[].body' | grep -i "lgtm")
+if [ ! -z "$LGTM_COMMENT" ] && [ "$CI_STATUS" = "SUCCESS" ]; then
+  echo "🎉 LGTM comment found and all checks passed. Ready to merge!"
+  exit 5
 fi
 
 # すべてのチェックが通過
