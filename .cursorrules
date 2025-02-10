@@ -7,15 +7,14 @@
   - macOS環境を前提とした開発
 
 ## 基本コマンド
-- `make start-work branch=<branch-name>`: 作業開始（ブランチ作成、環境準備）
-- `make submit-work title="<pr-title>"`: PR作成
-- その他の開発コマンド
-  - `make init`: プロジェクトの初期化
-  - `make install`: 依存関係のインストール
-  - `make dev`: 開発サーバーの起動
-  - `make test`: テストの実行
-  - `make lint`: リントの実行
-  - `make type-check`: 型チェックの実行
+- `make init`: プロジェクトの初期化
+- `make install`: 依存関係のインストール
+- `make dev`: 開発サーバーの起動
+- `make build`: プロダクションビルド
+- `make test`: テストの実行
+- `make lint`: リントの実行
+- `make type-check`: 型チェックの実行
+- `make clean`: ビルドファイルとキャッシュの削除
 
 ## 作業の基本ルール
 - 作業はすべて作業用ブランチで実施
