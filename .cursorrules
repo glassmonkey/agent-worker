@@ -132,13 +132,18 @@
   5. すべてのチェックがパスするまで2-3を繰り返す
   6. 成功したらレビューを依頼
 - PRマージ監視手順
-  1. レビュー承認後、手動でPRをマージ
-  2. マージ後、以下のコマンドを実行してマージ完了を確認
+  1. レビューを依頼後、以下のコマンドを実行してレビュー状態を確認
+     ```bash
+     sleep 30 && gh pr view $PR_NUMBER --json reviewDecision -q .reviewDecision
+     ```
+  2. レビューが承認されていない場合は、再度手順1を実行
+  3. レビュー承認後、手動でPRをマージ
+  4. マージ後、以下のコマンドを実行してマージ完了を確認
      ```bash
      sleep 30 && gh pr view $PR_NUMBER --json state -q .state
      ```
-  3. 状態が`MERGED`でない場合は、再度手順2を実行
-  4. 状態が`MERGED`になったら以下を実行
+  5. 状態が`MERGED`でない場合は、再度手順4を実行
+  6. 状態が`MERGED`になったら以下を実行
      ```bash
      git switch main && git pull origin main
      ```
