@@ -19,9 +19,39 @@
   3. 修正をコミット
   4. レビューコメントに返信
      - レビューコメントに直接リプライする形式で返信
-     ```bash
-     gh pr review --comment --body "修正内容の説明\n\n修正コミット: コミットハッシュ" $PR_NUMBER
-     ```
+     - コメントIDを取得
+       ```bash
+       gh api graphql -f query='
+         query($owner: String!, $repo: String!, $pr_number: Int!) {
+           repository(owner: $owner, name: $repo) {
+             pullRequest(number: $pr_number) {
+               reviews(first: 100) {
+                 nodes {
+                   comments(first: 100) {
+                     nodes {
+                       id
+                       databaseId
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
+       ```
+     - リプライを送信（ヒアドキュメントで改行を保持）
+       ```bash
+       gh api \
+         --method POST \
+         -H "Accept: application/vnd.github+json" \
+         /repos/$OWNER/$REPO/pulls/$PR_NUMBER/comments/$COMMENT_ID/replies \
+         --raw-field body@- << EOF
+修正内容の説明
+
+修正コミット: コミットハッシュ
+EOF
+       ```
   5. CIの完了を待って、コメントをresolveに変更
   6. 必要に応じて手順2-5を繰り返す
 
@@ -154,9 +184,39 @@
     - マージ後は自動的にmainブランチに切り替え
   - レビューコメントへの返信
     1. レビューコメントに直接リプライする形式で返信
-     ```bash
-     gh pr review --comment --body "修正内容の説明\n\n修正コミット: コミットハッシュ" $PR_NUMBER
-     ```
+     - コメントIDを取得
+       ```bash
+       gh api graphql -f query='
+         query($owner: String!, $repo: String!, $pr_number: Int!) {
+           repository(owner: $owner, name: $repo) {
+             pullRequest(number: $pr_number) {
+               reviews(first: 100) {
+                 nodes {
+                   comments(first: 100) {
+                     nodes {
+                       id
+                       databaseId
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
+       ```
+     - リプライを送信（ヒアドキュメントで改行を保持）
+       ```bash
+       gh api \
+         --method POST \
+         -H "Accept: application/vnd.github+json" \
+         /repos/$OWNER/$REPO/pulls/$PR_NUMBER/comments/$COMMENT_ID/replies \
+         --raw-field body@- << EOF
+修正内容の説明
+
+修正コミット: コミットハッシュ
+EOF
+       ```
   3. CIの状態確認
      ```bash
      gh api graphql -f query='
@@ -306,9 +366,39 @@
      - マージ後は自動的にmainブランチに切り替え
   2. レビューコメントへの返信
      - レビューコメントに直接リプライする形式で返信
-     ```bash
-     gh pr review --comment --body "修正内容の説明\n\n修正コミット: コミットハッシュ" $PR_NUMBER
-     ```
+     - コメントIDを取得
+       ```bash
+       gh api graphql -f query='
+         query($owner: String!, $repo: String!, $pr_number: Int!) {
+           repository(owner: $owner, name: $repo) {
+             pullRequest(number: $pr_number) {
+               reviews(first: 100) {
+                 nodes {
+                   comments(first: 100) {
+                     nodes {
+                       id
+                       databaseId
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       ' -F owner=$OWNER -F repo=$REPO -F pr_number=$PR_NUMBER
+       ```
+     - リプライを送信（ヒアドキュメントで改行を保持）
+       ```bash
+       gh api \
+         --method POST \
+         -H "Accept: application/vnd.github+json" \
+         /repos/$OWNER/$REPO/pulls/$PR_NUMBER/comments/$COMMENT_ID/replies \
+         --raw-field body@- << EOF
+修正内容の説明
+
+修正コミット: コミットハッシュ
+EOF
+       ```
   3. CIの状態確認
      ```bash
      gh api graphql -f query='
