@@ -121,7 +121,9 @@ doc/
        EOF
        ```
   2. 新規PRの場合は`make pr-create`を実行
-  3. 既存PRの編集の場合は`PR_NUMBER=<PR番号> make pr-edit`を実行
+  3. 既存PRの編集の場合は`make pr-edit PR_NUMBER=<PR番号>`を実行
+     * makeコマンドは必ず先頭に記述すること
+     * 例：`make pr-edit PR_NUMBER=20`
   4. 作業完了後、`make pr-clean`で一時ファイルを削除
 * PRの説明文は以下のフォーマットに従うこと：
   ```markdown
