@@ -34,10 +34,16 @@ doc/
   * ドキュメント: `docs/内容`
   * リファクタリング: `refactor/内容`
   * テスト追加・修正: `test/内容`
-* コード変更を行う前に必ず以下の手順を実施すること：
+* mainブランチから新規ブランチを作成する際は、以下の手順を必ず実施すること：
   1. 現在のブランチを確認（`git branch --show-current`）
-  2. mainブランチにいる場合は新規ブランチを作成
-  3. 作業ブランチに切り替わっていることを確認
+  2. mainブランチに移動（`git checkout main`）
+  3. リモートの最新変更を取得（`git fetch origin main`）
+  4. ローカルのmainブランチを最新に更新（`git pull --rebase origin main`）
+  5. 新規ブランチを作成（`git checkout -b <branch-name>`）
+  6. 作業ブランチに切り替わっていることを確認
+* 作業開始前に必ず以下を確認すること：
+  1. 現在のブランチがmainでないこと
+  2. 作業ブランチが最新のmainから作成されていること
 
 ### コミット管理
 * 指示内容に応じてコード改変を行いcommitを実施する。commitの粒度はconversional commitに準拠する。
