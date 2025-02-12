@@ -95,6 +95,11 @@ doc/
 * testやlintが通るようになったらブランチ上のcommitを整理する。似たようなcommitや手戻りのあったcommitはひとまとめにするといった形にする。
 * commitの整理が完了したらpushをする。
 * pushをしたらPRをghコマンドを使って作成する。
+* PRの作成手順は以下の通り：
+  1. PR本文を`.work/pr_body.txt`に作成する
+  2. 新規PRの場合は`make pr-create`を実行
+  3. 既存PRの編集の場合は`PR_NUMBER=<PR番号> make pr-edit`を実行
+  4. 作業完了後、`make pr-clean`で一時ファイルを削除
 * PRの説明文は以下のフォーマットに従うこと：
   ```markdown
   # 概要

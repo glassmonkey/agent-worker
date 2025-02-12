@@ -134,6 +134,17 @@ reply-to-review: ## レビューコメントに返信する
 	@./scripts/reply-to-review.sh $(comment_id) "$(message)" $(include_commit)
 	@echo "✨ Reply sent successfully!"
 
+.PHONY: pr-create pr-edit pr-clean
+
+pr-create: ## Create a new pull request with a body from .work/pr_body.txt
+	gh pr create --body-file .work/pr_body.txt
+
+pr-edit: ## Edit an existing pull request with a body from .work/pr_body.txt
+	gh pr edit $(PR_NUMBER) --body-file .work/pr_body.txt
+
+pr-clean: ## Clean up temporary PR files
+	rm -f .work/pr_body.txt
+
 .PHONY: help
 # ヘルプの表示
 help: ## このヘルプメッセージを表示する
