@@ -137,7 +137,12 @@ doc/
        gh pr create --title "<type>(<scope>): <description>" --body-file .work/pr_body.txt
        ```
        - type, scope, descriptionはコミットメッセージと同じ形式を使用
-       - 例：`gh pr create --title "feat(user): ユーザー登録機能を追加" --body-file .work/pr_body.txt`
+       - descriptionは変更内容が一言でわかるような文章表現にすること
+       - 例：
+         - 良い例：`feat(user): ユーザー登録機能を追加`
+         - 良い例：`fix(auth): ログイン時のバリデーションエラーを修正`
+         - 悪い例：`feat: 機能追加`（具体的な内容が不明確）
+         - 悪い例：`fix: バグ修正`（何のバグかが不明確）
      * 既存PRの編集の場合は`make pr-edit PR_NUMBER=<PR番号>`を実行
        * makeコマンドは必ず先頭に記述すること
        * 例：`make pr-edit PR_NUMBER=20`
