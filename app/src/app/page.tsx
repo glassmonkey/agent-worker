@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import styles from './page.module.css'
 
 type Message = {
   id: string
@@ -12,30 +13,47 @@ type Message = {
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
+  const [count, setCount] = useState(0)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!newMessage.trim()) return
 
     const message: Message = {
-      id: crypto.randomUUID(),
-      text: newMessage,
+      id: Math.random().toString(36).substring(7),
+      text: newMessage.trim(),
       username: 'User',
       timestamp: new Date()
     }
 
-    setMessages(prev => [message, ...prev])
+    setMessages([message, ...messages])
     setNewMessage('')
   }
 
+  const increment = () => {
+    setCount(count + 1)
+  }
+
+  const decrement = () => {
+    setCount(count - 1)
+  }
+
   return (
-    <main className="min-h-screen bg-black">
+    <main className={styles.main}>
       {/* Header */}
       <header className="sticky top-0 z-10 bg-black/80 backdrop-blur-sm border-b border-gray-700">
         <div className="max-w-2xl mx-auto px-4 py-3">
           <h1 className="text-xl font-bold text-white">こんにちは</h1>
         </div>
       </header>
+
+      <div className={styles.counter}>
+        <p>Count: {count}</p>
+        <div className={styles.buttons}>
+          <button onClick={increment}>Increment</button>
+          <button onClick={decrement}>Decrement</button>
+        </div>
+      </div>
 
       {/* Message Input */}
       <div className="max-w-2xl mx-auto px-4 py-4 border-b border-gray-700">

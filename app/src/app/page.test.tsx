@@ -1,11 +1,11 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Home from './page'
 
 describe('Home', () => {
   it('renders header with title', () => {
     render(<Home />)
-    const header = screen.getByRole('heading', { name: /home/i })
+    const header = screen.getByRole('heading', { name: /こんにちは/i })
     expect(header).toBeInTheDocument()
   })
 
@@ -43,5 +43,24 @@ describe('Home', () => {
     const message = screen.getByText('Hello, World!')
     expect(message).toBeInTheDocument()
     expect(textarea).toHaveValue('')
+  })
+
+  it('should render counter with initial value of 0', () => {
+    render(<Home />)
+    expect(screen.getByText('Count: 0')).toBeInTheDocument()
+  })
+
+  it('should increment counter when increment button is clicked', () => {
+    render(<Home />)
+    const incrementButton = screen.getByText('Increment')
+    fireEvent.click(incrementButton)
+    expect(screen.getByText('Count: 1')).toBeInTheDocument()
+  })
+
+  it('should decrement counter when decrement button is clicked', () => {
+    render(<Home />)
+    const decrementButton = screen.getByText('Decrement')
+    fireEvent.click(decrementButton)
+    expect(screen.getByText('Count: -1')).toBeInTheDocument()
   })
 }) 
