@@ -140,7 +140,7 @@ pr-create: ## Create a new pull request with a body from .work/pr_body.txt
 	gh pr create --body-file .work/pr_body.txt
 
 pr-edit: ## Edit an existing pull request with a body from .work/pr_body.txt
-	gh pr edit $(PR_NUMBER) --body-file .work/pr_body.txt
+	gh pr edit $(PR_NUMBER) --body-file .work/pr_body.txt --title "$$(gh pr view $(PR_NUMBER) --json title -q .title)"
 
 pr-clean: ## Clean up temporary PR files
 	rm -f .work/pr_body.txt
