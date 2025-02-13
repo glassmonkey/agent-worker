@@ -132,7 +132,7 @@ doc/
        EOF
        ```
   5. PRを作成
-     * 新規PRの場合：
+     * 新規PRの場合は`gh pr create`を実行
        ```bash
        gh pr create --title "<description>" --body-file .work/pr_body.txt
        ```
