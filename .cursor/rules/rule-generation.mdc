@@ -1,6 +1,6 @@
 ---
 description: ルールファイル生成に関するルールを定義します
-glob: .cursor/rules/*.mdc
+globs: [".cursor/rules/*.mdc"]
 ---
 
 # ルールファイル生成ルール
