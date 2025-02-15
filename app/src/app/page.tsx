@@ -6,20 +6,9 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <div className={styles.gameContainer}>
-        <div className={styles.invader}>
-          <div className={styles.invaderBody}>
-            <div className={styles.invaderEye}></div>
-            <div className={styles.invaderEye}></div>
-          </div>
-          <div className={styles.invaderLegs}>
-            <div className={styles.leg}></div>
-            <div className={styles.leg}></div>
-            <div className={styles.leg}></div>
-            <div className={styles.leg}></div>
-          </div>
-        </div>
         <h1 className={styles.gameTitle}>SPACE INVADERS</h1>
       </div>
+      <p className={styles.counter}>Welcome to the Invader Game! No enemies here, just enjoy the view.</p>
     </main>
   )
 }
