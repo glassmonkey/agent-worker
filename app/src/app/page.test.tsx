@@ -87,6 +87,27 @@ describe('Home', () => {
     expect(screen.queryAllByTestId('bullet')).toHaveLength(1)
   })
 
+  it('respects shooting cooldown', () => {
+    render(<Home />)
+    
+    // 1発目を発射
+    fireEvent.keyDown(window, { key: ' ' })
+    expect(screen.queryAllByTestId('bullet')).toHaveLength(1)
+    
+    // クールダウン中に発射を試みる
+    fireEvent.keyDown(window, { key: ' ' })
+    expect(screen.queryAllByTestId('bullet')).toHaveLength(1) // 弾は増えない
+    
+    // クールダウン時間を待つ
+    act(() => {
+      jest.advanceTimersByTime(250)
+    })
+    
+    // クールダウン後に発射
+    fireEvent.keyDown(window, { key: ' ' })
+    expect(screen.queryAllByTestId('bullet')).toHaveLength(2)
+  })
+
   it('moves bullets upward and removes them when they leave the screen', () => {
     render(<Home />)
     
