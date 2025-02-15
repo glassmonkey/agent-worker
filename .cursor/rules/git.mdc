@@ -1,6 +1,6 @@
 ---
 description: Gitの操作に関するルールを定義します
-glob: .git/**/*
+globs: ["**/*"]
 ---
 
 # Git操作ルール
