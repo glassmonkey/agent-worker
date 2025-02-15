@@ -1,0 +1,65 @@
+---
+description: Gitの操作に関するルールを定義します
+globs: 
+---
+
+# Git操作ルール
+
+## ブランチ管理
+
+### 基本ルール
+
+* mainブランチで指示があった場合指示内容に応じて新しくブランチを作成し、checkoutを行う。mainブランチ上でコード改変を含めて、git操作を行うことも禁止です。
+* ブランチ名は以下の命名規則に従うこと：
+  * 機能追加: `feat/機能名`
+  * バグ修正: `fix/修正内容`
+  * ドキュメント: `docs/内容`
+  * リファクタリング: `refactor/内容`
+  * テスト追加・修正: `test/内容`
+
+### ブランチ作成手順
+
+mainブランチから新規ブランチを作成する際は、以下の手順を必ず実施すること：
+
+1. 現在のブランチを確認（`git branch --show-current`）
+2. mainブランチに移動（`git checkout main`）
+3. リモートの最新変更を取得（`git fetch origin main`）
+4. ローカルのmainブランチを最新に更新（`git pull --rebase origin main`）
+5. 新規ブランチを作成（`git checkout -b <branch-name>`）
+6. 作業ブランチに切り替わっていることを確認
+
+### 作業開始前の確認事項
+
+作業開始前に必ず以下を確認すること：
+
+1. 現在のブランチがmainでないこと
+2. 作業ブランチが最新のmainから作成されていること
+
+## コミット管理
+
+### 基本ルール
+
+* 指示内容に応じてコード改変を行いcommitを実施する。commitの粒度はconversional commitに準拠する。
+* 作業完了の指示があるまで同一ブランチ上で作業をおこなってください。
+* レビュー指摘事項の修正は、新しいブランチを作成せず、同一ブランチ上で修正を続けること。
+* 全てのコード変更は必ずcommitすること
+
+### コミットメッセージフォーマット
+
+コミットメッセージは以下の形式に従うこと：
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer]
+```
+
+#### 各要素の説明
+
+- type: feat, fix, docs, style, refactor, test, chore のいずれか
+- scope: 変更の範囲（オプション）
+- description: 変更内容の要約（命令形で）
+- body: 変更の詳細な説明（オプション）
+- footer: Breaking changes や Issue への参照（オプション） 
