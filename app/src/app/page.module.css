@@ -119,4 +119,24 @@
 
 .buttons button:hover {
   background-color: #0051a2;
+}
+
+.gameArea {
+  width: 800px;
+  height: 600px;
+  border: 2px solid #0f0;
+  position: relative;
+  background-color: #000;
+  margin: 20px 0;
+}
+
+.player {
+  position: absolute;
+  bottom: 20px;
+  width: 40px;
+  height: 40px;
+  background-color: #0f0;
+  transform: translateX(-50%);
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  transition: left 0.1s ease-out;
 } 
