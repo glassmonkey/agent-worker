@@ -97,56 +97,16 @@ start-work: ## 作業用ブランチを作成し、作業環境を準備する
 	@echo "✨ Work environment initialized successfully!"
 	@echo "📝 PR draft created at .work/pr-draft.md"
 
-.PHONY: submit-work
-# PR作成
-submit-work: ## 作業内容をプッシュしてPRを作成する
-	@if [ -z "$(title)" ]; then \
-		echo "Usage: make submit-work title=<pr-title>"; \
-		echo "Example: make submit-work title=\"feat: カウンター機能の追加\""; \
-		exit 1; \
-	fi
-	@echo "🏁 Submitting work with PR title: $(title)..."
-	@if [ ! -f .work/pr-draft.md ]; then \
-		echo "⚠️  PR draft file not found at .work/pr-draft.md"; \
-		exit 1; \
-	fi
-	@echo "🔍 Checking for uncommitted changes..."
-	@if [ -n "$$(git status --porcelain)" ]; then \
-		echo "⚠️  You have uncommitted changes. Please commit or stash them first."; \
-		exit 1; \
-	fi
-	@echo "🚀 Pushing changes..."
-	@BRANCH=$$(git rev-parse --abbrev-ref HEAD); \
-	git push origin $$BRANCH
-	@echo "📤 Creating PR..."
-	@gh pr create --repo $$(git remote get-url origin | sed 's/.*://; s/\.git$$//') --title "$(title)" --body-file .work/pr-draft.md
-	@echo "✨ PR created successfully!"
-	@echo "👀 Starting PR monitoring..."
-	@$(MAKE) monitor-pr
-
 .PHONY: finish-work
 # 作業完了
 finish-work: ## レビュー通過後の作業を完了する
-	@echo "🧹 Running post-merge cleanup..."
-	@./scripts/finish-work.sh
-
-.PHONY: monitor-pr
-# レビューの監視
-monitor-pr: ## PRのレビュー状態とCIを監視する
-	@echo "👀 Monitoring PR status..."
-	@./scripts/monitor-pr.sh
-
-.PHONY: reply-to-review
-# レビューコメントへの返信
-reply-to-review: ## レビューコメントに返信する
-	@if [ -z "$(comment_id)" ] || [ -z "$(message)" ]; then \
-		echo "Usage: make reply-to-review comment_id=<comment_id> message=<message> [include_commit=true]"; \
-		echo "Example: make reply-to-review comment_id=123456789 message=\"修正しました。\" include_commit=true"; \
+	@if [ -z "$(PR)" ]; then \
+		echo "Usage: make finish-work PR=\"<pr-title>\""; \
+		echo "Example: make finish-work PR=\"feat: カウンター機能の追加\""; \
 		exit 1; \
 	fi
-	@echo "💬 Replying to comment $(comment_id)..."
-	@./scripts/reply-to-review.sh $(comment_id) "$(message)" $(include_commit)
-	@echo "✨ Reply sent successfully!"
+	@echo "🧹 Running post-merge cleanup..."
+	@./scripts/finish-work.sh "$(PR)"
 
 .PHONY: pr-clean
 # PR関連の一時ファイルのクリーンアップ
