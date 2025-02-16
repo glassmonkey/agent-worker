@@ -24,15 +24,22 @@ globs: [".work/*", ".gitignore"]
 ### 配置場所
 
 1. 全ての一時ファイルは`.work`ディレクトリ以下に配置すること
-   - PR関連: `.work/pr_description.md`, `.work/pr-draft.md`
-   - その他の作業用ファイル: `.work/<作業内容を表す名前>`
+   - テンプレート: `.work/templates/` 以下に配置
+     * PR用: `pr_template.md`
+     * Issue用: `issue_template.md`
+   - 一時的な作業ファイル: `.work/drafts/` 以下に配置
+     * PR下書き: `pr-draft.md`
+     * その他の作業用ファイル: `<作業内容を表す名前>.md`
 
 2. ディレクトリ構造
    ```
    .work/
-   ├── pr_description.md  # PR説明文の一時ファイル
-   ├── pr-draft.md       # PR下書きファイル
-   └── <その他の作業用ファイル>
+   ├── templates/           # テンプレートファイル
+   │   ├── pr_template.md   # PR用テンプレート
+   │   └── issue_template.md # Issue用テンプレート
+   └── drafts/             # 作業用の一時ファイル
+       ├── pr-draft.md      # PR下書きファイル
+       └── <その他の作業用ファイル>
    ```
 
 ### 命名規則
@@ -76,10 +83,9 @@ globs: [".work/*", ".gitignore"]
 
 1. 全ての一時ファイルの削除
    ```bash
-   make pr-clean  # 全ての一時ファイルを削除
+   make pr-clean  # draftsディレクトリ内の一時ファイルを削除
    ```
 
 2. 削除対象
-   - PR関連ファイル（`pr_description.md`, `pr-draft.md`）
-   - その他の作業用一時ファイル
-   - `.work`ディレクトリ内の全てのファイル
+   - `.work/drafts/`ディレクトリ内の全てのファイル
+   - テンプレートファイル（`.work/templates/`）は削除対象外
