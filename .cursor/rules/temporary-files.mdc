@@ -55,22 +55,22 @@ globs: [".work/*", ".gitignore"]
 ### クリーンアップのタイミング
 
 1. 作業開始時
-   - `make start-work`実行時に`.work`ディレクトリをクリーンアップ
+   - `make start-work`実行時に`make pr-clean`を実行
 
 2. PR作成完了時
-   - `make pr-clean`を実行して関連する一時ファイルを削除
+   - `make pr-clean`を実行して一時ファイルを削除
 
 3. 作業完了時
-   - `make finish-work`実行時に全ての一時ファイルをクリーンアップ
+   - `make finish-work`実行時に`make pr-clean`を実行
 
 ### クリーンアップ手順
 
-1. PR関連ファイルの削除
+1. 全ての一時ファイルの削除
    ```bash
-   make pr-clean  # PR関連の一時ファイルを削除
+   make pr-clean  # 全ての一時ファイルを削除
    ```
 
-2. 全ての一時ファイルの削除
-   ```bash
-   rm -rf .work/*  # 全ての一時ファイルを削除
-   ``` 
+2. 削除対象
+   - PR関連ファイル（`pr_description.md`, `pr-draft.md`）
+   - その他の作業用一時ファイル
+   - `.work`ディレクトリ内の全てのファイル 
