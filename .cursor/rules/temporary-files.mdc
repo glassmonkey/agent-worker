@@ -27,7 +27,11 @@ globs: [".work/*", ".gitignore"]
    - テンプレート: `.work/templates/` 以下
      * Issue関連: `issue_template.md`
    - 作業用一時ファイル: `.work/temp/` 以下
+     * PR説明文: `pr_description.md`
+     * その他の一時ファイル
    - ドラフト: `.work/drafts/` 以下
+     * PR下書き: `pr-draft.md`
+     * その他の下書きファイル
 
 2. ディレクトリ構造
    ```
@@ -35,7 +39,8 @@ globs: [".work/*", ".gitignore"]
    ├── templates/           # テンプレートファイル
    │   └── issue_template.md # Issue用テンプレート
    ├── temp/               # 一時的な作業ファイル
-   │   └── <作業用一時ファイル>
+   │   ├── pr_description.md # PR説明文の一時ファイル
+   │   └── <その他の作業用一時ファイル>
    └── drafts/             # 下書きファイル
        ├── pr-draft.md     # PR下書き
        └── <その他の下書きファイル>
@@ -84,9 +89,10 @@ globs: [".work/*", ".gitignore"]
 
 1. 全ての一時ファイルの削除
    ```bash
-   make pr-clean  # draftsディレクトリ内の一時ファイルを削除
+   make pr-clean  # 一時ファイルを削除
    ```
 
 2. 削除対象
    - `.work/drafts/`ディレクトリ内の全てのファイル
+   - `.work/temp/`ディレクトリ内の全てのファイル
    - テンプレートファイル（`.work/templates/`）は削除対象外
