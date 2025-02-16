@@ -15,9 +15,25 @@ if [ -n "$(git status --porcelain)" ]; then
     exit 1
 fi
 
+# mainブランチの最新状態を取得
+echo -e "${YELLOW}🔄 mainブランチの更新を確認します...${NC}"
+git fetch origin main
+
+# 現在のブランチ名を取得
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# mainブランチとの同期状態を確認
+BEHIND_COUNT=$(git rev-list --count HEAD..origin/main)
+if [ "$BEHIND_COUNT" -gt 0 ]; then
+    echo -e "${RED}❌ mainブランチの変更が取り込まれていません。${NC}"
+    echo -e "${YELLOW}以下のコマンドを実行して最新の変更を取り込んでください：${NC}"
+    echo -e "git fetch origin main"
+    echo -e "git merge origin/main"
+    exit 1
+fi
+
 # 振り返りの確認
 RETROSPECTIVE_DIR="docs/retrospectives"
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 CURRENT_DATE=$(date +%Y%m%d)
 
 # 振り返りファイルの存在確認
