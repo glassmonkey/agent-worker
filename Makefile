@@ -147,4 +147,46 @@ help: ## このヘルプメッセージを表示する
 	@echo "Usage: make [target]"
 	@echo ""
 	@echo "Targets:"
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}' 
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+
+.PHONY: prepare-retrospective open-retrospective check-retrospective
+
+# 振り返りの準備
+prepare-retrospective: ## 振り返りの準備を行う
+	@echo "🤔 振り返りの準備を開始します..."
+	@mkdir -p .work
+	@cp .github/templates/retrospective_template.md .work/retrospective.md
+	@echo "✨ 振り返りの準備が完了しました"
+	@echo "📝 振り返りファイルを開きます..."
+	@$(MAKE) open-retrospective
+
+# 振り返りテンプレートを開く
+open-retrospective: ## 振り返りファイルを開く
+	@if [ ! -f .work/retrospective.md ]; then \
+		make prepare-retrospective; \
+	fi
+	@${EDITOR:-vi} .work/retrospective.md
+
+# 振り返りの完了確認
+check-retrospective: ## 振り返りの完了を確認する
+	@echo "🔍 振り返りの完了を確認します..."
+	@if [ ! -f .work/retrospective.md ]; then \
+		echo "❌ 振り返りファイルが見つかりません"; \
+		exit 1; \
+	fi
+	@if [ "$$(wc -l < .work/retrospective.md)" -lt 10 ]; then \
+		echo "❌ 振り返りの内容が不十分です"; \
+		exit 1; \
+	fi
+	@if grep -q "<!-- " .work/retrospective.md; then \
+		echo "❌ テンプレートのコメントが残っています"; \
+		exit 1; \
+	fi
+	@echo "✅ 振り返りが完了しています"
+
+# 実装準備が整っているか確認
+check-ready: check-retrospective ## 実装の準備状況を確認する
+	@echo "🔍 実装の準備状況を確認します..."
+	@make test
+	@make lint
+	@echo "✅ 実装の準備が整っています"
