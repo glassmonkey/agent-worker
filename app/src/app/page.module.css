@@ -122,41 +122,27 @@
 }
 
 .gameArea {
-  width: 800px;
-  height: 600px;
-  border: 2px solid #0f0;
   position: relative;
+  width: 100%;
+  height: 400px;
   background-color: #000;
-  margin: 20px 0;
+  overflow: hidden;
 }
 
 .player {
   position: absolute;
   bottom: 20px;
-  width: 40px;
-  height: 40px;
-  background-color: #0f0;
+  width: 30px;
+  height: 30px;
+  background-color: #fff;
   transform: translateX(-50%);
-  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-  transition: left 0.1s ease-out;
 }
 
 .bullet {
   position: absolute;
   width: 4px;
-  height: 12px;
-  background-color: #0f0;
+  height: 10px;
+  background-color: #fff;
+  border-radius: 2px;
   transform: translateX(-50%);
-  box-shadow: 0 0 8px #0f0;
-  animation: bulletGlow 0.5s infinite alternate;
-  transition: top 0.05s linear;
-}
-
-@keyframes bulletGlow {
-  from {
-    box-shadow: 0 0 8px #0f0;
-  }
-  to {
-    box-shadow: 0 0 16px #0f0;
-  }
 } 

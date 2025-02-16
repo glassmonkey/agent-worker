@@ -2,6 +2,8 @@ import { render, screen, fireEvent, act } from '@testing-library/react'
 import Home from './page'
 import '@testing-library/jest-dom'
 
+jest.useFakeTimers()
+
 describe('Home', () => {
   beforeEach(() => {
     jest.useFakeTimers()
@@ -13,7 +15,7 @@ describe('Home', () => {
 
   it('renders Welcome message', () => {
     render(<Home />)
-    const message = screen.getByText(/Welcome to the Invader Game! No enemies here, just enjoy the view./i)
+    const message = screen.getByText(/Press SPACE to shoot!/i)
     expect(message).toBeInTheDocument()
   })
 
@@ -91,12 +93,16 @@ describe('Home', () => {
     render(<Home />)
     
     // 1発目を発射
-    fireEvent.keyDown(window, { key: ' ' })
+    act(() => {
+      fireEvent.keyDown(window, { key: ' ' })
+    })
     expect(screen.queryAllByTestId('bullet')).toHaveLength(1)
     
     // クールダウン中に発射を試みる
-    fireEvent.keyDown(window, { key: ' ' })
-    expect(screen.queryAllByTestId('bullet')).toHaveLength(1) // 弾は増えない
+    act(() => {
+      fireEvent.keyDown(window, { key: ' ' })
+    })
+    expect(screen.queryAllByTestId('bullet')).toHaveLength(1) // クールダウン中は新しい弾が作られない
     
     // クールダウン時間を待つ
     act(() => {
@@ -104,7 +110,9 @@ describe('Home', () => {
     })
     
     // クールダウン後に発射
-    fireEvent.keyDown(window, { key: ' ' })
+    act(() => {
+      fireEvent.keyDown(window, { key: ' ' })
+    })
     expect(screen.queryAllByTestId('bullet')).toHaveLength(2)
   })
 

@@ -5,18 +5,25 @@ import styles from './page.module.css'
 
 export default function Home() {
   const [playerPosition, setPlayerPosition] = useState(50) // 画面中央を初期位置とする
-  const [bullets, setBullets] = useState<{ id: number; x: number; y: number }[]>([])
-  const [canShoot, setCanShoot] = useState(true) // 発射可能状態を管理
+  const [bullets, setBullets] = useState<{ id: number; position: number; bottom: number }[]>([])
+  const [isCooldown, setIsCooldown] = useState(false) // クールダウン状態を管理
   const moveSpeed = 5 // 移動速度
   const bulletSpeed = 5
   const shootCooldown = 250 // 発射間隔（ミリ秒）
-  let bulletId = 0
+  const COOLDOWN_TIME = 250 // クールダウン時間（ミリ秒）
+  const GAME_HEIGHT = 100 // ゲーム領域の高さ（パーセント）
+  const BULLET_SPEED = 5 // 弾の速度（ピクセル）
 
   // 発射音を再生する関数
-  const playShootSound = () => {
-    const audio = new Audio('/shoot.mp3')
-    audio.volume = 0.3 // 音量を30%に設定
-    audio.play().catch(error => console.log('Audio playback failed:', error))
+  function playShootSound() {
+    if (typeof window !== 'undefined') {
+      const audio = new Audio('/shoot.mp3')
+      audio.volume = 0.3 // 音量を30%に設定
+      const playPromise = audio.play()
+      if (playPromise !== undefined) {
+        playPromise.catch(error => console.log('Audio playback failed:', error))
+      }
+    }
   }
 
   useEffect(() => {
@@ -25,42 +32,37 @@ export default function Home() {
         setPlayerPosition((prev) => Math.max(0, prev - moveSpeed))
       } else if (event.key === 'ArrowRight') {
         setPlayerPosition((prev) => Math.min(100, prev + moveSpeed))
-      } else if (event.key === ' ' && canShoot) {
-        // 弾を発射（クールダウン中は発射不可）
-        setCanShoot(false)
+      } else if (event.key === ' ' && !isCooldown) {
         playShootSound()
-        setBullets(prev => [...prev, {
-          id: bulletId++,
-          x: playerPosition,
-          y: 95 // プレイヤーの位置（画面下部から5%の位置）
-        }])
-        
-        // クールダウン後に発射可能状態に戻す
+        const newBullet = {
+          id: Date.now(),
+          position: playerPosition,
+          bottom: 60, // プレイヤーの高さに合わせて調整
+        }
+        setBullets(prev => [...prev, newBullet])
+        setIsCooldown(true)
         setTimeout(() => {
-          setCanShoot(true)
-        }, shootCooldown)
+          setIsCooldown(false)
+        }, COOLDOWN_TIME)
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [playerPosition, canShoot])
+  }, [playerPosition, isCooldown])
 
-  // 弾の移動を制御
   useEffect(() => {
-    const interval = setInterval(() => {
+    const moveInterval = setInterval(() => {
       setBullets(prev => {
-        // 画面外に出た弾を削除し、残りの弾を上に移動
-        return prev
-          .filter(bullet => bullet.y > 0)
-          .map(bullet => ({
-            ...bullet,
-            y: bullet.y - bulletSpeed // 上方向への移動（yの値を減少）
-          }))
+        const newBullets = prev.map(bullet => ({
+          ...bullet,
+          bottom: bullet.bottom + BULLET_SPEED,
+        }))
+        return newBullets.filter(bullet => bullet.bottom < GAME_HEIGHT)
       })
-    }, 50)
+    }, 16) // 約60FPS
 
-    return () => clearInterval(interval)
+    return () => clearInterval(moveInterval)
   }, [])
 
   return (
@@ -68,21 +70,21 @@ export default function Home() {
       <div className={styles.gameContainer}>
         <h1 className={styles.gameTitle}>SPACE INVADERS</h1>
         <div className={styles.gameArea}>
+          <div
+            className={styles.player}
+            style={{ left: `${playerPosition}%` }}
+          />
           {bullets.map(bullet => (
             <div
               key={bullet.id}
               data-testid="bullet"
               className={styles.bullet}
               style={{
-                left: `${bullet.x}%`,
-                top: `${bullet.y}%`
+                left: `${bullet.position}%`,
+                bottom: `${bullet.bottom}px`,
               }}
             />
           ))}
-          <div 
-            className={styles.player}
-            style={{ left: `${playerPosition}%` }}
-          />
         </div>
       </div>
       <p className={styles.counter}>Press SPACE to shoot!</p>
