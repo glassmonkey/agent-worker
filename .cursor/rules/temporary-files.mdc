@@ -25,7 +25,6 @@ globs: [".work/*", ".gitignore"]
 
 1. 全ての一時ファイルは`.work`ディレクトリ以下に配置すること
    - テンプレート: `.work/templates/` 以下
-     * PR関連: `pr_template.md`
      * Issue関連: `issue_template.md`
    - 作業用一時ファイル: `.work/temp/` 以下
    - ドラフト: `.work/drafts/` 以下
@@ -34,7 +33,6 @@ globs: [".work/*", ".gitignore"]
    ```
    .work/
    ├── templates/           # テンプレートファイル
-   │   ├── pr_template.md  # PR用テンプレート
    │   └── issue_template.md # Issue用テンプレート
    ├── temp/               # 一時的な作業ファイル
    │   └── <作業用一時ファイル>
@@ -42,6 +40,8 @@ globs: [".work/*", ".gitignore"]
        ├── pr-draft.md     # PR下書き
        └── <その他の下書きファイル>
    ```
+
+注: PRテンプレートは`.github/pull_request_template.md`に配置され、GitHubの標準機能として管理されます。
 
 ### 命名規則
 
