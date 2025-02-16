@@ -34,22 +34,22 @@ export default function Home() {
         setPlayerPosition((prev) => Math.min(100, prev + moveSpeed))
       } else if (event.key === ' ' && !isCooldown) {
         playShootSound()
-        const newBullet = {
+        setBullets(prev => [...prev, {
           id: Date.now(),
           position: playerPosition,
-          bottom: 60, // プレイヤーの高さに合わせて調整
-        }
-        setBullets(prev => [...prev, newBullet])
+          bottom: 60,
+        }])
         setIsCooldown(true)
-        setTimeout(() => {
+        const timer = setTimeout(() => {
           setIsCooldown(false)
         }, COOLDOWN_TIME)
+        return () => clearTimeout(timer)
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [playerPosition, isCooldown])
+  }, [playerPosition, isCooldown, COOLDOWN_TIME])
 
   useEffect(() => {
     const moveInterval = setInterval(() => {
@@ -60,10 +60,10 @@ export default function Home() {
         }))
         return newBullets.filter(bullet => bullet.bottom < GAME_HEIGHT)
       })
-    }, 16) // 約60FPS
+    }, 16)
 
     return () => clearInterval(moveInterval)
-  }, [])
+  }, [BULLET_SPEED, GAME_HEIGHT])
 
   return (
     <main className={styles.main}>
