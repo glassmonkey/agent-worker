@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# 色の定義
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo -e "${YELLOW}🔍 プッシュ前の確認を開始します...${NC}"
+
+# 未コミットの変更をチェック
+if [ -n "$(git status --porcelain)" ]; then
+    echo -e "${RED}❌ 未コミットの変更があります。先にコミットしてください。${NC}"
+    git status
+    exit 1
+fi
+
+# 振り返りの確認
+if [ -f .work/retrospective.md ]; then
+    # テンプレートのコメントが残っていないかチェック
+    if grep -q "<!--" .work/retrospective.md; then
+        echo -e "${RED}❌ 振り返りファイルにテンプレートのコメントが残っています。${NC}"
+        exit 1
+    fi
+    
+    # 最小行数のチェック（10行以上）
+    if [ "$(wc -l < .work/retrospective.md)" -lt 10 ]; then
+        echo -e "${RED}❌ 振り返りの内容が不十分です（10行以上必要）。${NC}"
+        exit 1
+    fi
+fi
+
+# テストの実行
+echo -e "${YELLOW}🧪 テストを実行します...${NC}"
+if ! make test; then
+    echo -e "${RED}❌ テストが失敗しました。${NC}"
+    exit 1
+fi
+
+# リンターの実行
+echo -e "${YELLOW}🔍 リンターを実行します...${NC}"
+if ! make lint; then
+    echo -e "${RED}❌ リンターチェックが失敗しました。${NC}"
+    exit 1
+fi
+
+# 型チェックの実行
+echo -e "${YELLOW}✅ 型チェックを実行します...${NC}"
+if ! make type-check; then
+    echo -e "${RED}❌ 型チェックが失敗しました。${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}✨ 全ての確認が完了しました。プッシュを続行します。${NC}"
+exit 0 

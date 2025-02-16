@@ -4,9 +4,23 @@
 # 共通の変数
 APP_DIR := app
 
+.PHONY: setup-hooks
+# Git hooksのセットアップ
+setup-hooks: ## Git hooksをセットアップする
+	@echo "🔧 Git hooksをセットアップします..."
+	@mkdir -p .git/hooks
+	@for hook in .github/hooks/*; do \
+		if [ -f "$$hook" ]; then \
+			ln -sf ../../$$hook .git/hooks/; \
+			chmod +x $$hook; \
+			echo "✨ $$hook をセットアップしました"; \
+		fi \
+	done
+	@echo "✅ Git hooksのセットアップが完了しました"
+
 .PHONY: init
 # 初期化（プロジェクトの初期セットアップ）
-init: ## プロジェクトの初期化を行う
+init: setup-hooks ## プロジェクトの初期化を行う
 	@echo "🚀 Initializing project..."
 	@if ! command -v gh &> /dev/null; then \
 		echo "📥 Installing GitHub CLI..."; \
