@@ -16,18 +16,43 @@ if [ -n "$(git status --porcelain)" ]; then
 fi
 
 # 振り返りの確認
-if [ -f .work/retrospective.md ]; then
-    # テンプレートのコメントが残っていないかチェック
-    if grep -q "<!--" .work/retrospective.md; then
-        echo -e "${RED}❌ 振り返りファイルにテンプレートのコメントが残っています。${NC}"
+RETROSPECTIVE_DIR="docs/retrospectives"
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+CURRENT_DATE=$(date +%Y%m%d)
+
+# 振り返りファイルの存在確認
+RETROSPECTIVE_FILE=$(find "$RETROSPECTIVE_DIR" -name "${CURRENT_DATE}_*.md" -type f)
+
+if [ -z "$RETROSPECTIVE_FILE" ]; then
+    echo -e "${RED}❌ 本日の振り返りファイルが見つかりません。${NC}"
+    echo -e "${YELLOW}以下の形式で振り返りファイルを作成してください：${NC}"
+    echo -e "${YELLOW}${RETROSPECTIVE_DIR}/YYYYMMDD_theme.md${NC}"
+    exit 1
+fi
+
+# 振り返りファイルの内容チェック
+echo -e "${YELLOW}📝 振り返りファイルをチェックします...${NC}"
+
+# 必須セクションの確認
+REQUIRED_SECTIONS=("# 概要" "## 良かった点" "## 課題" "## 改善案" "## アクションアイテム" "## 学んだこと" "## 次回のアクション" "## 結論")
+for section in "${REQUIRED_SECTIONS[@]}"; do
+    if ! grep -q "$section" "$RETROSPECTIVE_FILE"; then
+        echo -e "${RED}❌ 振り返りファイルに必須セクション '$section' が含まれていません。${NC}"
         exit 1
     fi
-    
-    # 最小行数のチェック（10行以上）
-    if [ "$(wc -l < .work/retrospective.md)" -lt 10 ]; then
-        echo -e "${RED}❌ 振り返りの内容が不十分です（10行以上必要）。${NC}"
-        exit 1
-    fi
+done
+
+# アクションアイテムのissue参照確認
+if ! grep -q "issue #[0-9]" "$RETROSPECTIVE_FILE"; then
+    echo -e "${RED}❌ アクションアイテムにissueの参照が含まれていません。${NC}"
+    echo -e "${YELLOW}各アクションアイテムにissue番号を記載してください（例: issue #123）${NC}"
+    exit 1
+fi
+
+# 最小行数のチェック（30行以上）
+if [ "$(wc -l < "$RETROSPECTIVE_FILE")" -lt 30 ]; then
+    echo -e "${RED}❌ 振り返りの内容が不十分です（30行以上必要）。${NC}"
+    exit 1
 fi
 
 # テストの実行
