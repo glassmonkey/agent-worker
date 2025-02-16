@@ -72,8 +72,8 @@ start-work: ## 作業用ブランチを作成し、作業環境を準備する
 	@git fetch origin main
 	@git switch main
 	@git pull origin main
-	@echo "🧹 Cleaning .work directory..."
-	@rm -rf .work/*
+	@echo "🧹 Cleaning temporary files..."
+	@$(MAKE) pr-clean
 	@echo "🌱 Creating work branch: $(branch)..."
 	@git checkout -b $(branch)
 	@echo "📁 Preparing .work directory..."
@@ -135,9 +135,11 @@ reply-to-review: ## レビューコメントに返信する
 	@echo "✨ Reply sent successfully!"
 
 .PHONY: pr-clean
-
-pr-clean: ## Clean up temporary PR files
-	rm -f .work/pr_body.txt
+# PR関連の一時ファイルのクリーンアップ
+pr-clean: ## 一時ファイルを削除する
+	@echo "🧹 Cleaning up temporary files..."
+	@rm -rf .work/*
+	@echo "✨ Temporary files cleaned up successfully!"
 
 .PHONY: help
 # ヘルプの表示
