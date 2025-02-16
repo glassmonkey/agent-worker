@@ -15,21 +15,32 @@ if [ -n "$(git status --porcelain)" ]; then
     exit 1
 fi
 
-# mainブランチの最新状態を取得
-echo -e "${YELLOW}🔄 mainブランチの更新を確認します...${NC}"
-git fetch origin main
-
 # 現在のブランチ名を取得
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
+# リモートの最新状態を取得
+echo -e "${YELLOW}🔄 リモートの更新を確認します...${NC}"
+git fetch origin
+
 # mainブランチとの同期状態を確認
-BEHIND_COUNT=$(git rev-list --count HEAD..origin/main)
-if [ "$BEHIND_COUNT" -gt 0 ]; then
+BEHIND_MAIN_COUNT=$(git rev-list --count HEAD..origin/main)
+if [ "$BEHIND_MAIN_COUNT" -gt 0 ]; then
     echo -e "${RED}❌ mainブランチの変更が取り込まれていません。${NC}"
     echo -e "${YELLOW}以下のコマンドを実行して最新の変更を取り込んでください：${NC}"
     echo -e "git fetch origin main"
     echo -e "git merge origin/main"
     exit 1
+fi
+
+# リモートブランチの存在確認と同期状態チェック
+if git ls-remote --exit-code origin "$CURRENT_BRANCH" &>/dev/null; then
+    BEHIND_REMOTE_COUNT=$(git rev-list --count HEAD..origin/"$CURRENT_BRANCH")
+    if [ "$BEHIND_REMOTE_COUNT" -gt 0 ]; then
+        echo -e "${RED}❌ リモートブランチの変更が取り込まれていません。${NC}"
+        echo -e "${YELLOW}以下のコマンドを実行して最新の変更を取り込んでください：${NC}"
+        echo -e "git pull origin $CURRENT_BRANCH"
+        exit 1
+    fi
 fi
 
 # 振り返りの確認
