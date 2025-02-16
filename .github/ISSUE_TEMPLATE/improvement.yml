@@ -1,0 +1,84 @@
+name: 改善提案
+description: 既存機能の改善や最適化の提案
+title: "改善: "
+labels: ["improvement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        既存機能の改善や最適化について、以下の項目を記入してください。
+
+  - type: textarea
+    id: current-state
+    attributes:
+      label: 現状の課題
+      description: 現在の実装や運用における課題を説明してください
+      placeholder: |
+        例：
+        - 現状の問題点
+        - 非効率な部分
+        - 改善が必要な理由
+    validations:
+      required: true
+
+  - type: textarea
+    id: improvement-proposal
+    attributes:
+      label: 改善案
+      description: 具体的な改善案を記載してください
+      placeholder: |
+        例：
+        - 改善の方向性
+        - 具体的な変更内容
+        - 期待される効果
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: 実装方針
+      description: 改善を実装するための方針を記載してください
+      placeholder: |
+        例：
+        1. まず○○の部分を修正
+        2. 次に××の最適化を実施
+        3. 最後に△△の検証を実行
+    validations:
+      required: true
+
+  - type: textarea
+    id: benefits
+    attributes:
+      label: 改善効果
+      description: 改善による具体的な効果を記載してください
+      placeholder: |
+        例：
+        - パフォーマンスの向上
+        - 保守性の改善
+        - 運用効率の向上
+    validations:
+      required: true
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: リスクと対策
+      description: 改善に伴うリスクと対策を記載してください
+      placeholder: |
+        例：
+        - 想定されるリスク
+        - 影響を受ける機能
+        - リスク対策
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 補足情報
+      description: その他、補足事項や参考情報があれば記載してください
+      placeholder: |
+        - 参考資料
+        - 関連するIssue/PR
+        - 検討事項 

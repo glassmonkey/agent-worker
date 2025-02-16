@@ -1,0 +1,76 @@
+name: バグ報告
+description: バグの報告や不具合の指摘
+title: "バグ: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        バグの報告や不具合の指摘について、以下の項目を記入してください。
+
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: 現在の動作
+      description: 発生している問題について説明してください
+      placeholder: |
+        例：
+        - いつ発生するか
+        - どのような状況で発生するか
+        - エラーメッセージがあれば記載
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: 期待される動作
+      description: 本来どのように動作すべきか説明してください
+      placeholder: |
+        例：
+        - 正常時の動作
+        - 期待される結果
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 再現手順
+      description: バグを再現するための手順を記載してください
+      placeholder: |
+        1. まず○○の画面を開く
+        2. ××のボタンをクリック
+        3. △△の値を入力
+        4. エラーが発生する
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 環境情報
+      description: バグが発生した環境について記載してください
+      placeholder: |
+        - OS: macOS 12.0
+        - ブラウザ: Chrome 96.0
+        - バージョン: v1.2.3
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: ログ出力
+      description: 関連するログ出力があれば記載してください
+      render: shell
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 補足情報
+      description: その他、補足事項や参考情報があれば記載してください
+      placeholder: |
+        - 関連する Issue/PR
+        - 回避方法
+        - 考慮すべき点 

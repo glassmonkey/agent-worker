@@ -24,16 +24,30 @@ globs: [".work/*", ".gitignore"]
 ### 配置場所
 
 1. 全ての一時ファイルは`.work`ディレクトリ以下に配置すること
-   - PR関連: `.work/pr_description.md`, `.work/pr-draft.md`
-   - その他の作業用ファイル: `.work/<作業内容を表す名前>`
+   - 作業用一時ファイル: `.work/temp/` 以下
+     * PR説明文: `pr_description.md`
+     * その他の一時ファイル
+   - ドラフト: `.work/drafts/` 以下
+     * PR下書き: `pr-draft.md`
+     * その他の下書きファイル
 
 2. ディレクトリ構造
    ```
    .work/
-   ├── pr_description.md  # PR説明文の一時ファイル
-   ├── pr-draft.md       # PR下書きファイル
-   └── <その他の作業用ファイル>
+   ├── temp/               # 一時的な作業ファイル
+   │   ├── pr_description.md # PR説明文の一時ファイル
+   │   └── <その他の作業用一時ファイル>
+   └── drafts/             # 下書きファイル
+       ├── pr-draft.md     # PR下書き
+       └── <その他の下書きファイル>
    ```
+
+注: テンプレートファイルは`.github`ディレクトリ以下に配置され、バージョン管理されます：
+- PRテンプレート: `.github/pull_request_template.md`
+- Issueテンプレート: `.github/ISSUE_TEMPLATE/`以下
+  * `feature.yml`: 機能追加用テンプレート
+  * `bug.yml`: バグ報告用テンプレート
+  * `improvement.yml`: 改善提案用テンプレート
 
 ### 命名規則
 
@@ -47,7 +61,7 @@ globs: [".work/*", ".gitignore"]
 2. 形式：`<目的>：<具体的な内容>`
    例：
    - "一時ファイル管理の自動化：ghコマンドのエイリアス作成"
-   - "PRテンプレートの保存場所を.workディレクトリに統一"
+   - "テンプレートの保存場所を.githubディレクトリに統一"
    - "一時ファイル管理ルールの重複記述を整理"
 
 ### Gitでの管理
@@ -76,10 +90,9 @@ globs: [".work/*", ".gitignore"]
 
 1. 全ての一時ファイルの削除
    ```bash
-   make pr-clean  # 全ての一時ファイルを削除
+   make pr-clean  # 一時ファイルを削除
    ```
 
 2. 削除対象
-   - PR関連ファイル（`pr_description.md`, `pr-draft.md`）
-   - その他の作業用一時ファイル
-   - `.work`ディレクトリ内の全てのファイル
+   - `.work/drafts/`ディレクトリ内の全てのファイル
+   - `.work/temp/`ディレクトリ内の全てのファイル
