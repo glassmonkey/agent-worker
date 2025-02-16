@@ -8,8 +8,6 @@ export default function Home() {
   const [bullets, setBullets] = useState<{ id: number; position: number; bottom: number }[]>([])
   const [isCooldown, setIsCooldown] = useState(false) // クールダウン状態を管理
   const moveSpeed = 5 // 移動速度
-  const bulletSpeed = 5
-  const shootCooldown = 250 // 発射間隔（ミリ秒）
   const COOLDOWN_TIME = 250 // クールダウン時間（ミリ秒）
   const GAME_HEIGHT = 100 // ゲーム領域の高さ（パーセント）
   const BULLET_SPEED = 5 // 弾の速度（ピクセル）
