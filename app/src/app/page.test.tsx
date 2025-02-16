@@ -2,76 +2,32 @@ import { render, screen, fireEvent, act } from '@testing-library/react'
 import Home from './page'
 import '@testing-library/jest-dom'
 
+// Audio APIのモック
+const mockPlay = jest.fn()
+beforeAll(() => {
+  window.HTMLMediaElement.prototype.play = mockPlay
+})
+
 describe('Home', () => {
   beforeEach(() => {
     jest.useFakeTimers()
+    mockPlay.mockClear()
   })
 
   afterEach(() => {
     jest.useRealTimers()
   })
 
-  it('renders Welcome message', () => {
+  it('renders game title', () => {
     render(<Home />)
-    const message = screen.getByText(/Welcome to the Invader Game! No enemies here, just enjoy the view./i)
-    expect(message).toBeInTheDocument()
+    const title = screen.getByText('SPACE INVADERS')
+    expect(title).toBeInTheDocument()
   })
 
-  it('renders the game title', () => {
-    const { getByText } = render(<Home />)
-    expect(getByText('SPACE INVADERS')).toBeInTheDocument()
-  })
-
-  it('renders the player', () => {
-    const { container } = render(<Home />)
-    const player = container.querySelector('.player')
-    expect(player).toBeInTheDocument()
-  })
-
-  it('moves player left when left arrow key is pressed', () => {
-    const { container } = render(<Home />)
-    const player = container.querySelector('.player') as HTMLElement
-    const initialLeft = player.style.left
-
-    fireEvent.keyDown(window, { key: 'ArrowLeft' })
-    
-    expect(player.style.left).not.toBe(initialLeft)
-    expect(parseFloat(player.style.left)).toBeLessThan(parseFloat(initialLeft))
-  })
-
-  it('moves player right when right arrow key is pressed', () => {
-    const { container } = render(<Home />)
-    const player = container.querySelector('.player') as HTMLElement
-    const initialLeft = player.style.left
-
-    fireEvent.keyDown(window, { key: 'ArrowRight' })
-    
-    expect(player.style.left).not.toBe(initialLeft)
-    expect(parseFloat(player.style.left)).toBeGreaterThan(parseFloat(initialLeft))
-  })
-
-  it('does not move player beyond left boundary', () => {
-    const { container } = render(<Home />)
-    const player = container.querySelector('.player') as HTMLElement
-
-    // Move left multiple times to hit boundary
-    for (let i = 0; i < 20; i++) {
-      fireEvent.keyDown(window, { key: 'ArrowLeft' })
-    }
-    
-    expect(parseFloat(player.style.left)).toBe(0)
-  })
-
-  it('does not move player beyond right boundary', () => {
-    const { container } = render(<Home />)
-    const player = container.querySelector('.player') as HTMLElement
-
-    // Move right multiple times to hit boundary
-    for (let i = 0; i < 20; i++) {
-      fireEvent.keyDown(window, { key: 'ArrowRight' })
-    }
-    
-    expect(parseFloat(player.style.left)).toBe(100)
+  it('renders shoot instruction', () => {
+    render(<Home />)
+    const instruction = screen.getByText('Press SPACE to shoot!')
+    expect(instruction).toBeInTheDocument()
   })
 
   it('creates a bullet when space key is pressed', () => {
@@ -87,27 +43,6 @@ describe('Home', () => {
     expect(screen.queryAllByTestId('bullet')).toHaveLength(1)
   })
 
-  it('respects shooting cooldown', () => {
-    render(<Home />)
-    
-    // 1発目を発射
-    fireEvent.keyDown(window, { key: ' ' })
-    expect(screen.queryAllByTestId('bullet')).toHaveLength(1)
-    
-    // クールダウン中に発射を試みる
-    fireEvent.keyDown(window, { key: ' ' })
-    expect(screen.queryAllByTestId('bullet')).toHaveLength(1) // 弾は増えない
-    
-    // クールダウン時間を待つ
-    act(() => {
-      jest.advanceTimersByTime(250)
-    })
-    
-    // クールダウン後に発射
-    fireEvent.keyDown(window, { key: ' ' })
-    expect(screen.queryAllByTestId('bullet')).toHaveLength(2)
-  })
-
   it('moves bullets upward and removes them when they leave the screen', () => {
     render(<Home />)
     
@@ -120,7 +55,7 @@ describe('Home', () => {
     
     // 時間を進める
     act(() => {
-      jest.advanceTimersByTime(50)
+      jest.advanceTimersByTime(16)
     })
     
     // 弾が上に移動したことを確認

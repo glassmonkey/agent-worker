@@ -4,9 +4,23 @@
 # 共通の変数
 APP_DIR := app
 
+.PHONY: setup-hooks
+# Git hooksのセットアップ
+setup-hooks: ## Git hooksをセットアップする
+	@echo "🔧 Git hooksをセットアップします..."
+	@mkdir -p .git/hooks
+	@for hook in .github/hooks/*; do \
+		if [ -f "$$hook" ]; then \
+			ln -sf ../../$$hook .git/hooks/; \
+			chmod +x $$hook; \
+			echo "✨ $$hook をセットアップしました"; \
+		fi \
+	done
+	@echo "✅ Git hooksのセットアップが完了しました"
+
 .PHONY: init
 # 初期化（プロジェクトの初期セットアップ）
-init: ## プロジェクトの初期化を行う
+init: setup-hooks ## プロジェクトの初期化を行う
 	@echo "🚀 Initializing project..."
 	@if ! command -v gh &> /dev/null; then \
 		echo "📥 Installing GitHub CLI..."; \
@@ -147,4 +161,77 @@ help: ## このヘルプメッセージを表示する
 	@echo "Usage: make [target]"
 	@echo ""
 	@echo "Targets:"
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}' 
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+
+.PHONY: prepare-retrospective open-retrospective check-retrospective
+
+# 振り返りの準備
+prepare-retrospective: ## 振り返りの準備を行う
+	@echo "🤔 振り返りの準備を開始します..."
+	@mkdir -p .work
+	@cp .github/templates/retrospective_template.md .work/retrospective.md
+	@echo "✨ 振り返りの準備が完了しました"
+	@echo "📝 振り返りファイルを開きます..."
+	@$(MAKE) open-retrospective
+
+# 振り返りテンプレートを開く
+open-retrospective: ## 振り返りファイルを開く
+	@if [ ! -f .work/retrospective.md ]; then \
+		make prepare-retrospective; \
+	fi
+	@${EDITOR:-vi} .work/retrospective.md
+
+# 振り返りの完了確認
+check-retrospective: ## 振り返りの完了を確認する
+	@echo "🔍 振り返りの完了を確認します..."
+	@if [ ! -f .work/retrospective.md ]; then \
+		echo "❌ 振り返りファイルが見つかりません"; \
+		exit 1; \
+	fi
+	@if [ "$$(wc -l < .work/retrospective.md)" -lt 10 ]; then \
+		echo "❌ 振り返りの内容が不十分です"; \
+		exit 1; \
+	fi
+	@if grep -q "<!-- " .work/retrospective.md; then \
+		echo "❌ テンプレートのコメントが残っています"; \
+		exit 1; \
+	fi
+	@echo "✅ 振り返りが完了しています"
+
+# 実装準備が整っているか確認
+check-ready: check-retrospective ## 実装の準備状況を確認する
+	@echo "🔍 実装の準備状況を確認します..."
+	@make test
+	@make lint
+	@echo "✅ 実装の準備が整っています"
+
+.PHONY: issue-prepare issue-create issue-clean
+
+# issue作成の準備
+issue-prepare: ## issueの作成準備を行う
+	@echo "📝 Preparing issue creation..."
+	@mkdir -p .work
+	@if [ ! -f .work/issue_body.md ]; then \
+		cp .github/templates/issue_template.md .work/issue_body.md; \
+	fi
+	@${EDITOR} .work/issue_body.md
+
+# issueの作成
+issue-create: ## issueを作成する
+	@if [ -z "$(title)" ] || [ -z "$(label)" ]; then \
+		echo "Usage: make issue-create title=\"<title>\" label=\"<label>\""; \
+		echo "Example: make issue-create title=\"機能追加: 新機能の実装\" label=\"enhancement\""; \
+		exit 1; \
+	fi
+	@if [ ! -f .work/issue_body.md ]; then \
+		echo "❌ Issue body file not found. Run 'make issue-prepare' first."; \
+		exit 1; \
+	fi
+	@echo "🚀 Creating issue..."
+	@gh issue create --title "$(title)" --body-file .work/issue_body.md --label "$(label)"
+	@$(MAKE) issue-clean
+
+# issue関連ファイルのクリーンアップ
+issue-clean: ## issue関連の一時ファイルを削除する
+	@echo "🧹 Cleaning up issue files..."
+	@rm -f .work/issue_body.md

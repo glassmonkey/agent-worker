@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# 色の定義
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo -e "${YELLOW}🔍 プッシュ前の確認を開始します...${NC}"
+
+# 未コミットの変更をチェック
+if [ -n "$(git status --porcelain)" ]; then
+    echo -e "${RED}❌ 未コミットの変更があります。先にコミットしてください。${NC}"
+    git status
+    exit 1
+fi
+
+# 振り返りの確認
+RETROSPECTIVE_DIR="docs/retrospectives"
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+CURRENT_DATE=$(date +%Y%m%d)
+
+# 振り返りファイルの存在確認
+RETROSPECTIVE_FILE=$(find "$RETROSPECTIVE_DIR" -name "${CURRENT_DATE}_*.md" -type f)
+
+if [ -z "$RETROSPECTIVE_FILE" ]; then
+    echo -e "${RED}❌ 本日の振り返りファイルが見つかりません。${NC}"
+    echo -e "${YELLOW}以下の形式で振り返りファイルを作成してください：${NC}"
+    echo -e "${YELLOW}${RETROSPECTIVE_DIR}/YYYYMMDD_theme.md${NC}"
+    exit 1
+fi
+
+# 振り返りファイルの内容チェック
+echo -e "${YELLOW}📝 振り返りファイルをチェックします...${NC}"
+
+# 必須セクションの確認
+REQUIRED_SECTIONS=("# 概要" "## 良かった点" "## 課題" "## 改善案" "## アクションアイテム" "## 学んだこと" "## 次回のアクション" "## 結論")
+for section in "${REQUIRED_SECTIONS[@]}"; do
+    if ! grep -q "$section" "$RETROSPECTIVE_FILE"; then
+        echo -e "${RED}❌ 振り返りファイルに必須セクション '$section' が含まれていません。${NC}"
+        exit 1
+    fi
+done
+
+# アクションアイテムのissue参照確認
+if ! grep -q "issue #[0-9]" "$RETROSPECTIVE_FILE"; then
+    echo -e "${RED}❌ アクションアイテムにissueの参照が含まれていません。${NC}"
+    echo -e "${YELLOW}各アクションアイテムにissue番号を記載してください（例: issue #123）${NC}"
+    exit 1
+fi
+
+# 最小行数のチェック（30行以上）
+if [ "$(wc -l < "$RETROSPECTIVE_FILE")" -lt 30 ]; then
+    echo -e "${RED}❌ 振り返りの内容が不十分です（30行以上必要）。${NC}"
+    exit 1
+fi
+
+# テストの実行
+echo -e "${YELLOW}🧪 テストを実行します...${NC}"
+if ! make test; then
+    echo -e "${RED}❌ テストが失敗しました。${NC}"
+    exit 1
+fi
+
+# リンターの実行
+echo -e "${YELLOW}🔍 リンターを実行します...${NC}"
+if ! make lint; then
+    echo -e "${RED}❌ リンターチェックが失敗しました。${NC}"
+    exit 1
+fi
+
+# 型チェックの実行
+echo -e "${YELLOW}✅ 型チェックを実行します...${NC}"
+if ! make type-check; then
+    echo -e "${RED}❌ 型チェックが失敗しました。${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}✨ 全ての確認が完了しました。プッシュを続行します。${NC}"
+exit 0 
