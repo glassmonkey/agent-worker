@@ -96,3 +96,11 @@ globs: [".work/*", ".gitignore"]
 2. 削除対象
    - `.work/drafts/`ディレクトリ内の全てのファイル
    - `.work/temp/`ディレクトリ内の全てのファイル
+
+3. クリーンアップの確認
+   - 一時ファイルが正常に削除されたことを確認
+   - `.work/temp/`と`.work/drafts/`が空であることを確認
+   ```bash
+   ls -la .work/temp/ .work/drafts/  # ディレクトリが空であることを確認
+   ```
+   - エラーメッセージがないことを確認
