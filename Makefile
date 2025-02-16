@@ -204,3 +204,34 @@ check-ready: check-retrospective ## 実装の準備状況を確認する
 	@make test
 	@make lint
 	@echo "✅ 実装の準備が整っています"
+
+.PHONY: issue-prepare issue-create issue-clean
+
+# issue作成の準備
+issue-prepare: ## issueの作成準備を行う
+	@echo "📝 Preparing issue creation..."
+	@mkdir -p .work
+	@if [ ! -f .work/issue_body.md ]; then \
+		cp .github/templates/issue_template.md .work/issue_body.md; \
+	fi
+	@${EDITOR} .work/issue_body.md
+
+# issueの作成
+issue-create: ## issueを作成する
+	@if [ -z "$(title)" ] || [ -z "$(label)" ]; then \
+		echo "Usage: make issue-create title=\"<title>\" label=\"<label>\""; \
+		echo "Example: make issue-create title=\"機能追加: 新機能の実装\" label=\"enhancement\""; \
+		exit 1; \
+	fi
+	@if [ ! -f .work/issue_body.md ]; then \
+		echo "❌ Issue body file not found. Run 'make issue-prepare' first."; \
+		exit 1; \
+	fi
+	@echo "🚀 Creating issue..."
+	@gh issue create --title "$(title)" --body-file .work/issue_body.md --label "$(label)"
+	@$(MAKE) issue-clean
+
+# issue関連ファイルのクリーンアップ
+issue-clean: ## issue関連の一時ファイルを削除する
+	@echo "🧹 Cleaning up issue files..."
+	@rm -f .work/issue_body.md

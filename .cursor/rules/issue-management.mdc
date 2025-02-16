@@ -124,8 +124,36 @@ globs: [".github/ISSUE_TEMPLATE/*", "**/*.md"]
    - 現状の課題、改善案、期待される効果を記載
    - リスクと対策を含める
 
-## 7. 関連ルール
+## 7. issue作成プロセス
+
+1. 一時ファイルの作成
+   ```bash
+   # .work/issue_body.mdに内容を記載
+   mkdir -p .work
+   ${EDITOR} .work/issue_body.md
+   ```
+
+2. issueの作成
+   ```bash
+   # 一時ファイルを使用してissueを作成
+   gh issue create --title "<タイトル>" --body-file .work/issue_body.md --label "<ラベル>"
+   ```
+
+3. 一時ファイルの削除
+   ```bash
+   # 使用済みの一時ファイルを削除
+   rm .work/issue_body.md
+   ```
+
+4. 作成時の注意点
+   - 一時ファイルを使用することで改行を適切に維持
+   - Markdownの書式を正しく使用
+   - 各セクション間に適切な空行を入れる
+   - コードブロックやリストのインデントを正確に設定
+
+## 8. 関連ルール
 
 * [開発サイクルルール](mdc:development-cycle.mdc): 開発サイクルの全体像
 * [実装プロセスルール](mdc:implementation-process.mdc): 実装の進め方
-* [PR作成ルール](mdc:pr-creation.mdc): PRの作成手順 
+* [PR作成ルール](mdc:pr-creation.mdc): PRの作成手順
+* [一時ファイル管理ルール](mdc:temporary-files.mdc): 一時ファイルの管理方法 
