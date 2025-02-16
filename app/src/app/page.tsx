@@ -25,6 +25,8 @@ export default function Home() {
   }
 
   useEffect(() => {
+    let timer: NodeJS.Timeout | null = null
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowLeft') {
         setPlayerPosition((prev) => Math.max(0, prev - moveSpeed))
@@ -38,15 +40,19 @@ export default function Home() {
           bottom: 60,
         }])
         setIsCooldown(true)
-        const timer = setTimeout(() => {
+        timer = setTimeout(() => {
           setIsCooldown(false)
         }, COOLDOWN_TIME)
-        return () => clearTimeout(timer)
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      if (timer) {
+        clearTimeout(timer)
+      }
+    }
   }, [playerPosition, isCooldown, COOLDOWN_TIME])
 
   useEffect(() => {
