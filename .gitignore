@@ -1,2 +1,9 @@
 # Local temporary files
-.work/ 
+.work/
+pr_description.md
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo 
