@@ -127,8 +127,13 @@ submit-work: ## 作業内容をプッシュしてPRを作成する
 .PHONY: finish-work
 # 作業完了
 finish-work: ## レビュー通過後の作業を完了する
+	@if [ -z "$(PR)" ]; then \
+		echo "Usage: make finish-work PR=\"<pr-title>\""; \
+		echo "Example: make finish-work PR=\"feat: カウンター機能の追加\""; \
+		exit 1; \
+	fi
 	@echo "🧹 Running post-merge cleanup..."
-	@./scripts/finish-work.sh
+	@./scripts/finish-work.sh "$(PR)"
 
 .PHONY: monitor-pr
 # レビューの監視
