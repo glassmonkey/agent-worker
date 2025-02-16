@@ -42,9 +42,12 @@ globs: [".work/*", ".gitignore"]
        └── <その他の下書きファイル>
    ```
 
-注: テンプレートファイルは`.github/templates/`以下に配置され、バージョン管理されます：
+注: テンプレートファイルは`.github`ディレクトリ以下に配置され、バージョン管理されます：
 - PRテンプレート: `.github/pull_request_template.md`
-- Issueテンプレート: `.github/templates/issue_template.md`
+- Issueテンプレート: `.github/ISSUE_TEMPLATE/`以下
+  * `feature.yml`: 機能追加用テンプレート
+  * `bug.yml`: バグ報告用テンプレート
+  * `improvement.yml`: 改善提案用テンプレート
 
 ### 命名規則
 

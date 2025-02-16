@@ -1,0 +1,69 @@
+name: 機能追加
+description: 新機能の追加や既存機能の拡張を提案
+title: "機能追加: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        新機能の追加や既存機能の拡張について、以下の項目を記入してください。
+
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 目的と背景
+      description: この機能が必要な理由や背景を説明してください
+      placeholder: |
+        例：
+        - 現状の課題
+        - 解決したい問題
+        - 期待される効果
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: 実装方針
+      description: 具体的な実装方法や手順を記載してください
+      placeholder: |
+        例：
+        1. まず○○の機能を実装
+        2. 次に××との連携を追加
+        3. 最後に△△のテストを実施
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 受け入れ基準
+      description: この機能が完了したと判断するための基準を記載してください
+      placeholder: |
+        - [ ] ○○の機能が実装されている
+        - [ ] ××との連携が動作する
+        - [ ] △△のテストが通過する
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: 影響範囲
+      description: この変更による影響範囲を記載してください
+      placeholder: |
+        - 影響を受けるコンポーネント
+        - 変更が必要な関連機能
+        - 考慮すべき副作用
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 補足情報
+      description: その他、補足事項や参考情報があれば記載してください
+      placeholder: |
+        - 参考資料
+        - 関連するIssue/PR
+        - 検討事項 
